@@ -1,4 +1,5 @@
 import _ from "lodash";
+import uuid from "node-uuid";
 import Promise from "bluebird";
 
 import * as log from "./logger";
@@ -95,7 +96,9 @@ export const migrate = async () => {
         },
       ],
       account: {
-        id: process.env.SOLARIS_KONTIST_ACCOUNT_ID,
+        id:
+          process.env.SOLARIS_KONTIST_ACCOUNT_ID ||
+          "mockpersonkontistgmbh-account-1",
         iban: "DE58110101002263909949",
         bic: process.env.SOLARIS_BIC,
         type: "CHECKING_BUSINESS",

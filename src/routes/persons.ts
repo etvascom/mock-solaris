@@ -2,11 +2,18 @@ import crypto from "crypto";
 import _ from "lodash";
 import uuid from "node-uuid";
 
-import { getPerson, getAllPersons, savePerson } from "../db";
+import {
+  getPerson,
+  getAllPersons,
+  savePerson,
+  findPersonByAccountId,
+} from "../db";
 
 import { createChangeRequest } from "./changeRequest";
 import { triggerWebhook } from "../helpers/webhooks";
 import { PersonWebhookEvent } from "../helpers/types";
+import { cleanPersonFields } from "../helpers/person";
+import { transformData } from "../helpers/transformData";
 
 export const createPerson = (req, res) => {
   const personId =
@@ -23,6 +30,8 @@ export const createPerson = (req, res) => {
     createdAt: new Date().toISOString(),
   };
 
+  // seed transactions and accounts
+
   return savePerson(person).then(() => {
     res.status(200).send({
       id: personId,
@@ -36,7 +45,7 @@ export const showPerson = async (req, res) => {
   try {
     const person = await getPerson(personId);
 
-    return res.status(200).send(person);
+    return res.status(200).send(cleanPersonFields(person));
   } catch (err) {
     if (err.message === "did not find person") {
       const resp = {
@@ -68,12 +77,29 @@ export const showPerson = async (req, res) => {
 export const showPersons = async (req, res) => {
   const { page: { size = 10, number = 1 } = {} } = req.query;
 
-  const persons = ((await getAllPersons()) || []).slice(
-    (number - 1) * size,
-    size * number
-  );
+  const persons = ((await getAllPersons()) || [])
+    .slice((number - 1) * size, size * number)
+    .map(cleanPersonFields);
 
   return res.status(200).send(persons);
+};
+
+export const showPersonBookings = async (req, res) => {
+  const { account_id: accountId } = req.params;
+
+  const person = await findPersonByAccountId(accountId);
+
+  const transactions = _.get(person, "transactions", []);
+
+  const sortAccepted = ["id", "booking_date", "valuta_date", "recorded_at"];
+
+  res.status(200).send(
+    transformData(transactions, {
+      ...req.query,
+      sort: req.query.sort || "booking_date",
+      sortAccepted,
+    })
+  );
 };
 
 export const PERSON_UPDATE = "Patch/Persons/person_id";

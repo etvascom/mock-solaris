@@ -167,6 +167,10 @@ router.post(
   safeRequestHandler(accountsAPI.createAccountSnapshot)
 );
 router.get(
+  "/persons/:person_id/accounts/:account_id/bookings",
+  safeRequestHandler(personsAPI.showPersonBookings)
+);
+router.get(
   "/accounts/:account_id/balance",
   safeRequestHandler(accountsAPI.showAccountBalance)
 );
@@ -656,7 +660,7 @@ export const serve = async (port) => {
   return new Promise((resolve, reject) => {
     app.listen(port, () => {
       log.debug(`mocksolaris listening on http://localhost:${port}/!`);
-      resolve();
+      resolve(true);
     });
   });
 };
