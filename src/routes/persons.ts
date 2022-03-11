@@ -14,6 +14,8 @@ import { triggerWebhook } from "../helpers/webhooks";
 import { PersonWebhookEvent } from "../helpers/types";
 import { cleanPersonFields } from "../helpers/person";
 import { transformData } from "../helpers/transformData";
+import { seedTransactions } from "../seeds/transactions";
+import { seedAccounts } from "../seeds/accounts";
 
 export const createPerson = (req, res) => {
   const personId =
@@ -24,13 +26,12 @@ export const createPerson = (req, res) => {
     ...req.body,
     id: personId,
     identifications: {},
-    transactions: [],
+    account: seedAccounts(5, personId),
+    transactions: seedTransactions(100),
     statements: [],
     queuedBookings: [],
     createdAt: new Date().toISOString(),
   };
-
-  // seed transactions and accounts
 
   return savePerson(person).then(() => {
     res.status(200).send({

@@ -1,9 +1,10 @@
 import _ from "lodash";
-import uuid from "node-uuid";
 import Promise from "bluebird";
 
 import * as log from "./logger";
 import { calculateOverdraftInterest } from "./helpers/overdraft";
+import { seedTransactions } from "./seeds/transactions";
+import { seedAccounts } from "./seeds/accounts";
 
 let redis;
 
@@ -76,42 +77,8 @@ export const migrate = async () => {
         },
       },
       screening_progress: null,
-      transactions: [
-        {
-          id: "e0492abb-87fd-42a2-9303-708026b90c8e",
-          amount: {
-            value: 100,
-            currency: "EUR",
-          },
-          valuta_date: "2017-12-24",
-          description: "kauf dir was",
-          booking_date: "2017-09-25",
-          name: "topping up the dunning account",
-          recipient_bic: process.env.SOLARIS_BIC,
-          recipient_iban: "ES0254451416043911355892",
-          recipient_name: "Kontist GmbH",
-          sender_bic: process.env.SOLARIS_BIC,
-          sender_iban: "DE00000000002901",
-          sender_name: "Alexander Baatz Retirement Fund",
-        },
-      ],
-      account: {
-        id:
-          process.env.SOLARIS_KONTIST_ACCOUNT_ID ||
-          "mockpersonkontistgmbh-account-1",
-        iban: "DE58110101002263909949",
-        bic: process.env.SOLARIS_BIC,
-        type: "CHECKING_BUSINESS",
-        person_id: "mockpersonkontistgmbh",
-        balance: {
-          value: 100,
-        },
-        sender_name: "unknown",
-        locking_status: "",
-        available_balance: {
-          value: 100,
-        },
-      },
+      transactions: seedTransactions(100),
+      accounts: seedAccounts(5, "mockpersonkontistgmbh"),
       billing_account: {
         id: process.env.SOLARIS_KONTIST_BILLING_ACCOUNT_ID,
         iban: "DE58110101002263909949",
@@ -342,13 +309,13 @@ export const getAllIdentifications = () => {
 
 export const findPersonByAccountField = async (findBy) => {
   const persons = await getAllPersons();
-  return persons.filter((person) => person.account).find(findBy);
+  return persons.filter((person) => person.accounts).find(findBy);
 };
 
 export const findPersonByAccountId = (accountId) =>
   findPersonByAccountField(
     (person) =>
-      person.account.id === accountId ||
+      person.accounts.some((account) => account.id === accountId) ||
       (person.billing_account || {}).id === accountId
   );
 

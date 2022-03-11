@@ -73,38 +73,43 @@ export const showAccountBookings = async (req, res) => {
 export const showAccountReservations = async (req, res) => {
   const {
     page: { size, number },
-    filter: {
-      reservation_type: reservationType,
-    },
+    filter: { reservation_type: reservationType },
   } = req.query;
 
   const { account_id: accountId } = req.params;
   const person = await findPersonByAccountId(accountId);
 
-
   const reservations = _.get(person.account, "reservations", [])
-    .filter(reservation => reservation.reservation_type === reservationType)
+    .filter((reservation) => reservation.reservation_type === reservationType)
     .slice((number - 1) * size, number * size);
 
   res.status(200).send(reservations);
 };
 
 export const showPersonAccount = async (req, res) => {
-  const { person_id: personId } = req.params;
+  const { person_id: personId, id } = req.params;
 
   const person = await getPerson(personId);
-  const account = _.pick(person.account, requestAccountFields);
 
-  res.status(200).send(account);
+  const account = person.accounts.find((acc) => acc.id === id);
+
+  if (!account) {
+    return res.status(404).send({});
+  }
+
+  const _account = _.pick(account, requestAccountFields);
+
+  res.status(200).send(_account);
 };
 
 export const showPersonAccounts = async (req, res) => {
   const { person_id: personId } = req.params;
   const person = await getPerson(personId);
 
-  const accounts = person.account
-    ? [_.pick(person.account, requestAccountFields)]
-    : [];
+  const accounts = person.accounts.map((account) =>
+    _.pick(account, requestAccountFields)
+  );
+
   res.status(200).send(accounts);
 };
 
