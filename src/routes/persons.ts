@@ -16,18 +16,21 @@ import { cleanPersonFields } from "../helpers/person";
 import { transformData } from "../helpers/transformData";
 import { seedTransactions } from "../seeds/transactions";
 import { seedAccounts } from "../seeds/accounts";
+import { cleanBookingFields } from "../helpers/booking";
 
 export const createPerson = (req, res) => {
   const personId =
     "mock" +
     crypto.createHash("md5").update(JSON.stringify(req.body)).digest("hex");
 
+  const accounts = seedAccounts(5, personId);
+
   const person = {
     ...req.body,
     id: personId,
     identifications: {},
-    account: seedAccounts(5, personId),
-    transactions: seedTransactions(100),
+    accounts,
+    transactions: _.flatten(accounts.map(({ id }) => seedTransactions(1, id))),
     statements: [],
     queuedBookings: [],
     createdAt: new Date().toISOString(),
@@ -90,7 +93,9 @@ export const showPersonBookings = async (req, res) => {
 
   const person = await findPersonByAccountId(accountId);
 
-  const transactions = _.get(person, "transactions", []);
+  const transactions = _.get(person, "transactions", []).filter(
+    ({ account_id }) => account_id === accountId
+  );
 
   const sortAccepted = ["id", "booking_date", "valuta_date", "recorded_at"];
 
@@ -99,7 +104,7 @@ export const showPersonBookings = async (req, res) => {
       ...req.query,
       sort: req.query.sort || "booking_date",
       sortAccepted,
-    })
+    }).map(cleanBookingFields)
   );
 };
 

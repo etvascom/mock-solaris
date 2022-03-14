@@ -4,7 +4,7 @@ import Promise from "bluebird";
 import * as log from "./logger";
 import { calculateOverdraftInterest } from "./helpers/overdraft";
 import { seedTransactions } from "./seeds/transactions";
-import { seedAccounts } from "./seeds/accounts";
+import { seedAccount, seedAccounts } from "./seeds/accounts";
 
 let redis;
 
@@ -32,6 +32,26 @@ export const migrate = async () => {
     throw new Error("during development, we create it every time");
   } catch (error) {
     log.warn("kontistGmbHAccount not found, creating");
+
+    const accounts = [
+      { ...seedAccount("mockpersonkontistgmbh"), type: "CHECKING_BUSINESS" },
+      {
+        ...seedAccount("mockpersonkontistgmbh"),
+        locking_status: "BLOCK",
+        locking_reasons: ["COMPLIANCE"],
+      },
+      {
+        ...seedAccount("mockpersonkontistgmbh"),
+        locking_status: "DEBIT_BLOCK",
+        locking_reasons: ["COMPLIANCE"],
+      },
+      {
+        ...seedAccount("mockpersonkontistgmbh"),
+        locking_status: "CREDIT_BLOCK",
+        locking_reasons: ["COMPLIANCE"],
+      },
+      { ...seedAccount("mockpersonkontistgmbh") },
+    ];
 
     await savePerson({
       salutation: "MR",
@@ -77,8 +97,10 @@ export const migrate = async () => {
         },
       },
       screening_progress: null,
-      transactions: seedTransactions(100),
-      accounts: seedAccounts(5, "mockpersonkontistgmbh"),
+      transactions: _.flatten(
+        accounts.map(({ id }) => seedTransactions(100, id))
+      ),
+      accounts,
       billing_account: {
         id: process.env.SOLARIS_KONTIST_BILLING_ACCOUNT_ID,
         iban: "DE58110101002263909949",

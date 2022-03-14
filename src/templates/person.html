@@ -108,7 +108,7 @@
   </div>
   <div class="col-md-6">
 
-    {% if person.account %}
+    {% if person.accounts.length %}
     <!-- New Booking -->
     <div class="panel panel-default">
       <div class="panel-heading"><h4>Enqueue a new booking</h4></div>
@@ -209,30 +209,30 @@
     </div>
   </div>
 </div>
-<h3 id="account"> Account for {{ person.email }} </h3>
-{% if person.account %}
+<h3 id="account"> Account for {{ person.email }} 13 </h3>
+{% if person.accounts.length %}
 
 <div class="panel panel-default">
   <div class="panel-heading">About this account</div>
   <table class="table">
     <tr>
       <td>Balance</td>
-      <td>{{ person.account.balance.value / 100 }} €</td>
+      <td>{{ person.accounts[0].balance.value / 100 }} €</td>
     </tr>
     <tr>
       <td>Available balance</td>
-      <td>{{ person.account.available_balance.value / 100 }} €</td>
+      <td>{{ person.accounts[0].available_balance.value / 100 }} €</td>
     </tr>
     <tr>
       <td>Limit</td>
-      <td>{{ person.account.account_limit.value / 100 }} €</td>
+      <td>{{ person.accounts[0].account_limit.value / 100 }} €</td>
     </tr>
     <tr>
       <td>Overdraft Interest</td>
       <td>
         <form method="POST" action="/__BACKOFFICE__/issueInterestAccruedBooking/{{ person.id }}">
-          {{ person.account.overdraftInterest / 100 }} €
-          <button type="submit" class="btn btn-warning btn-sm" {% if person.account.overdraftInterest <= 0 %} disabled {% endif %}>
+          {{ person.accounts[0].overdraftInterest / 100 }} €
+          <button type="submit" class="btn btn-warning btn-sm" {% if person.accounts[0].overdraftInterest <= 0 %} disabled {% endif %}>
             Issue
           </button>
         </form>

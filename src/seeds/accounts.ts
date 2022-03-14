@@ -1,5 +1,3 @@
-/* tslint-disable */
-
 import * as falso from "@ngneat/falso";
 
 export const seedAccount = (personId: string) => ({
@@ -11,6 +9,16 @@ export const seedAccount = (personId: string) => ({
   locking_status: "NO_BLOCK",
   locking_reasons: [],
   person_id: personId,
+  account_limit: {
+    value: falso.randNumber(),
+  },
+  available_balance: {
+    value: falso.randNumber(),
+  },
+  balance: {
+    value: falso.randNumber(),
+  },
+  overdraftInterest: falso.randNumber(),
 });
 
 export const seedAccounts = (length: number, personId: string) =>

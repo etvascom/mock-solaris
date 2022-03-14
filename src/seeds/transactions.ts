@@ -2,8 +2,9 @@ import { Booking } from "../helpers/types";
 import moment from "moment";
 import * as falso from "@ngneat/falso";
 
-export const seedTransaction = (): Booking => ({
+export const seedTransaction = (accountId: string): Booking => ({
   id: falso.randUuid(),
+  account_id: accountId,
   creation_date: moment(falso.randPastDate()).format("YYYY-MM-DD"),
   valuta_date: moment(falso.randPastDate()).format("YYYY-MM-DD"),
   booking_date: moment(falso.randPastDate()).format("YYYY-MM-DD"),
@@ -28,5 +29,7 @@ export const seedTransaction = (): Booking => ({
   meta_info: null,
 });
 
-export const seedTransactions = (length: number): Booking[] =>
-  Array.from({ length }).map(seedTransaction);
+export const seedTransactions = (
+  length: number,
+  accountId: string
+): Booking[] => Array.from({ length }).map(() => seedTransaction(accountId));
