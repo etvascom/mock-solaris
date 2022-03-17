@@ -3,6 +3,9 @@ import uuid from "node-uuid";
 import { getPerson, savePerson, findPersonByAccountId } from "../db";
 import { IBAN, CountryCode } from "ibankit";
 
+import { transformData } from "../helpers/transformData";
+import { cleanBookingFields } from "../helpers/booking";
+
 const ACCOUNT_SNAPSHOT_SOURCE = "SOLARISBANK";
 
 const DEFAULT_ACCOUNT = {
@@ -48,26 +51,21 @@ const requestAccountFields = [
 ];
 
 export const showAccountBookings = async (req, res) => {
-  const {
-    page: { size, number },
-    filter: {
-      booking_date: { min, max },
-    },
-  } = req.query;
   const { account_id: accountId } = req.params;
 
   const person = await findPersonByAccountId(accountId);
-  const minBookingDate = new Date(min);
-  const maxBookingDate = new Date(max);
 
-  const transactions = _.get(person, "transactions", [])
-    .filter((booking) => {
-      const bookingDate = new Date(booking.booking_date);
-      return bookingDate >= minBookingDate && bookingDate <= maxBookingDate;
-    })
-    .slice((number - 1) * size, number * size);
+  const transactions = _.get(person, "transactions", []);
 
-  res.status(200).send(transactions);
+  const sortAccepted = ["id", "booking_date", "valuta_date", "recorded_at"];
+
+  res.status(200).send(
+    transformData(transactions, {
+      ...req.query,
+      sort: req.query.sort || "booking_date",
+      sortAccepted,
+    }).map(cleanBookingFields)
+  );
 };
 
 export const showAccountReservations = async (req, res) => {

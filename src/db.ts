@@ -53,7 +53,7 @@ export const migrate = async () => {
       { ...seedAccount("mockpersonkontistgmbh") },
     ];
 
-    await savePerson({
+    const person = {
       salutation: "MR",
       first_name: "Kontist",
       last_name: "GmbH",
@@ -116,7 +116,23 @@ export const migrate = async () => {
           value: 100,
         },
       },
-    });
+    };
+
+    await savePerson(person);
+
+    await Promise.all(
+      Array.from({ length: 100 }).map((__, index) => {
+        const id = `${person.id}${index}`;
+        const acc = seedAccount(id);
+
+        return savePerson({
+          ...person,
+          id,
+          transactions: seedTransactions(1, acc.id),
+          accounts: [acc],
+        });
+      })
+    );
   }
 };
 
