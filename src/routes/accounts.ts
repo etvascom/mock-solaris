@@ -55,7 +55,9 @@ export const showAccountBookings = async (req, res) => {
 
   const person = await findPersonByAccountId(accountId);
 
-  const transactions = _.get(person, "transactions", []);
+  const transactions = _.get(person, "transactions", []).filter(
+    ({ account_id }) => account_id === accountId
+  );
 
   const sortAccepted = ["id", "booking_date", "valuta_date", "recorded_at"];
 
