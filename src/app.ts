@@ -657,10 +657,10 @@ export default app;
 export const serve = async (port) => {
   await migrate();
 
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     app.listen(port, () => {
       log.debug(`mocksolaris listening on http://localhost:${port}/!`);
-      resolve(true);
+      resolve();
     });
   });
 };
