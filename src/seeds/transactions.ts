@@ -10,7 +10,9 @@ export const seedTransaction = (accountId: string): Booking => ({
   booking_date: moment(falso.randPastDate()).format("YYYY-MM-DD"),
   booking_type: "DIRECT_DEBIT",
   amount: {
-    value: falso.randNumber(),
+    value:
+      falso.randNumber({ min: 100, max: 10_000 }) *
+      (Math.random() < 0.8 ? -1 : 1),
     unit: "cents",
     currency: "EUR",
   },

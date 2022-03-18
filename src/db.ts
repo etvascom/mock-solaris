@@ -155,48 +155,66 @@ export const getPerson = async (personId) => {
 
 export const getTechnicalUserPerson = () => getPerson("mockpersonkontistgmbh");
 
-const addAmountValues = (a, b) => a + b.amount.value;
+// const addAmountValues = (a, b) => a + b.amount.value;
 
 export const savePerson = async (person, skipInterest = false) => {
   person.address = person.address || { country: null };
 
-  const account = person.account;
+  const accounts = person.accounts;
 
-  if (account) {
+  if (accounts.length) {
     const transactions = person.transactions || [];
-    const queuedBookings = person.queuedBookings || [];
-    const reservations = person.account.reservations || [];
+    // const queuedBookings = person.queuedBookings || [];
+    // const reservations = person.account.reservations || [];
     const now = new Date().getTime();
-    const transactionsBalance = transactions
+
+    const mappedAccounts = accounts.reduce(
+      (acc, account) => ({
+        ...acc,
+        [account.id]: account,
+      }),
+      {}
+    );
+
+    transactions
       .filter(
         (transaction) => new Date(transaction.valuta_date).getTime() < now
       )
-      .reduce(addAmountValues, 0);
-    const confirmedTransfersBalance = queuedBookings
-      .filter((booking) => booking.status === "accepted")
-      .reduce(addAmountValues, 0);
-    const reservationsBalance = reservations.reduce(addAmountValues, 0);
-    const limitBalance =
-      (account.account_limit && account.account_limit.value) || 0;
+      .forEach((transaction) => {
+        if (!mappedAccounts[transaction.account_id]) {
+          return;
+        }
 
-    if (transactionsBalance < 0 && !skipInterest) {
-      calculateOverdraftInterest(account, transactionsBalance);
-    }
+        if (!mappedAccounts[transaction.account_id]?.balance?.unit) {
+          mappedAccounts[transaction.account_id].balance = {
+            value: 0,
+            unit: "cents",
+            currency: "EUR",
+          };
+        }
 
-    account.balance = {
-      value: transactionsBalance,
-    };
+        mappedAccounts[transaction.account_id].balance.value +=
+          transaction.amount.value;
 
-    account.available_balance = {
-      // Confirmed transfers amounts are negative
-      value:
-        limitBalance +
-        transactionsBalance +
-        confirmedTransfersBalance -
-        reservationsBalance,
-    };
+        mappedAccounts[transaction.account_id].available_balance = {
+          value: mappedAccounts[transaction.account_id].balance.value,
+          unit: "cents",
+          currency: "EUR",
+        };
+      });
+    // // .reduce(addAmountValues, 0);
+    // const confirmedTransfersBalance = queuedBookings
+    //   .filter((booking) => booking.status === "accepted")
+    //   .reduce(addAmountValues, 0);
+    // const reservationsBalance = reservations.reduce(addAmountValues, 0);
+    // const limitBalance =
+    //   (account.account_limit && account.account_limit.value) || 0;
 
-    person.account = account;
+    // if (transactionsBalance < 0 && !skipInterest) {
+    //   calculateOverdraftInterest(account, transactionsBalance);
+    // }
+
+    person.accounts = Object.values(mappedAccounts);
     person.timedOrders = person.timedOrders || [];
   }
 

@@ -26,9 +26,13 @@ export const seedAccount = (personId: string) => ({
   },
   available_balance: {
     value: falso.randNumber(),
+    unit: "cents",
+    currency: "EUR",
   },
   balance: {
-    value: falso.randNumber(),
+    value: falso.randNumber({ min: 1_000_000 }),
+    unit: "cents",
+    currency: "EUR",
   },
   overdraftInterest: falso.randNumber(),
 });

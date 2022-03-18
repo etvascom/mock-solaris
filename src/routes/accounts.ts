@@ -210,6 +210,10 @@ export const showAccountBalance = async (req, res) => {
   const { account_id: accountId } = req.params;
   const person = await findPersonByAccountId(accountId);
 
+  if (!person) {
+    res.status(404).json({ error: true, message: "Cannot find account owner" });
+  }
+
   const account = person.accounts.find((acc) => acc.id === accountId);
 
   const balance = _.pick(account, ["balance", "available_balance"]);
