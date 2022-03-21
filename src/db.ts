@@ -3,6 +3,8 @@ import Promise from "bluebird";
 
 import * as log from "./logger";
 import { calculateOverdraftInterest } from "./helpers/overdraft";
+import { seedTransactions } from "./seeds/transactions";
+import { seedAccount, seedAccounts } from "./seeds/accounts";
 
 let redis;
 
@@ -31,7 +33,27 @@ export const migrate = async () => {
   } catch (error) {
     log.warn("kontistGmbHAccount not found, creating");
 
-    await savePerson({
+    const accounts = [
+      { ...seedAccount("mockpersonkontistgmbh"), type: "CHECKING_BUSINESS" },
+      {
+        ...seedAccount("mockpersonkontistgmbh"),
+        locking_status: "BLOCK",
+        locking_reasons: ["COMPLIANCE"],
+      },
+      {
+        ...seedAccount("mockpersonkontistgmbh"),
+        locking_status: "DEBIT_BLOCK",
+        locking_reasons: ["COMPLIANCE"],
+      },
+      {
+        ...seedAccount("mockpersonkontistgmbh"),
+        locking_status: "CREDIT_BLOCK",
+        locking_reasons: ["COMPLIANCE"],
+      },
+      { ...seedAccount("mockpersonkontistgmbh") },
+    ];
+
+    const person = {
       salutation: "MR",
       first_name: "Kontist",
       last_name: "GmbH",
@@ -75,40 +97,10 @@ export const migrate = async () => {
         },
       },
       screening_progress: null,
-      transactions: [
-        {
-          id: "e0492abb-87fd-42a2-9303-708026b90c8e",
-          amount: {
-            value: 100,
-            currency: "EUR",
-          },
-          valuta_date: "2017-12-24",
-          description: "kauf dir was",
-          booking_date: "2017-09-25",
-          name: "topping up the dunning account",
-          recipient_bic: process.env.SOLARIS_BIC,
-          recipient_iban: "ES0254451416043911355892",
-          recipient_name: "Kontist GmbH",
-          sender_bic: process.env.SOLARIS_BIC,
-          sender_iban: "DE00000000002901",
-          sender_name: "Alexander Baatz Retirement Fund",
-        },
-      ],
-      account: {
-        id: process.env.SOLARIS_KONTIST_ACCOUNT_ID,
-        iban: "DE58110101002263909949",
-        bic: process.env.SOLARIS_BIC,
-        type: "CHECKING_BUSINESS",
-        person_id: "mockpersonkontistgmbh",
-        balance: {
-          value: 100,
-        },
-        sender_name: "unknown",
-        locking_status: "",
-        available_balance: {
-          value: 100,
-        },
-      },
+      transactions: _.flatten(
+        accounts.map(({ id }) => seedTransactions(100, id))
+      ),
+      accounts,
       billing_account: {
         id: process.env.SOLARIS_KONTIST_BILLING_ACCOUNT_ID,
         iban: "DE58110101002263909949",
@@ -124,7 +116,23 @@ export const migrate = async () => {
           value: 100,
         },
       },
-    });
+    };
+
+    await savePerson(person);
+
+    await Promise.all(
+      Array.from({ length: 100 }).map((__, index) => {
+        const id = `${person.id}${index}`;
+        const acc = seedAccount(id);
+
+        return savePerson({
+          ...person,
+          id,
+          transactions: seedTransactions(1, acc.id),
+          accounts: [acc],
+        });
+      })
+    );
   }
 };
 
@@ -147,48 +155,66 @@ export const getPerson = async (personId) => {
 
 export const getTechnicalUserPerson = () => getPerson("mockpersonkontistgmbh");
 
-const addAmountValues = (a, b) => a + b.amount.value;
+// const addAmountValues = (a, b) => a + b.amount.value;
 
 export const savePerson = async (person, skipInterest = false) => {
   person.address = person.address || { country: null };
 
-  const account = person.account;
+  const accounts = person.accounts;
 
-  if (account) {
+  if (accounts.length) {
     const transactions = person.transactions || [];
-    const queuedBookings = person.queuedBookings || [];
-    const reservations = person.account.reservations || [];
+    // const queuedBookings = person.queuedBookings || [];
+    // const reservations = person.account.reservations || [];
     const now = new Date().getTime();
-    const transactionsBalance = transactions
+
+    const mappedAccounts = accounts.reduce(
+      (acc, account) => ({
+        ...acc,
+        [account.id]: account,
+      }),
+      {}
+    );
+
+    transactions
       .filter(
         (transaction) => new Date(transaction.valuta_date).getTime() < now
       )
-      .reduce(addAmountValues, 0);
-    const confirmedTransfersBalance = queuedBookings
-      .filter((booking) => booking.status === "accepted")
-      .reduce(addAmountValues, 0);
-    const reservationsBalance = reservations.reduce(addAmountValues, 0);
-    const limitBalance =
-      (account.account_limit && account.account_limit.value) || 0;
+      .forEach((transaction) => {
+        if (!mappedAccounts[transaction.account_id]) {
+          return;
+        }
 
-    if (transactionsBalance < 0 && !skipInterest) {
-      calculateOverdraftInterest(account, transactionsBalance);
-    }
+        if (!mappedAccounts[transaction.account_id]?.balance?.unit) {
+          mappedAccounts[transaction.account_id].balance = {
+            value: 0,
+            unit: "cents",
+            currency: "EUR",
+          };
+        }
 
-    account.balance = {
-      value: transactionsBalance,
-    };
+        mappedAccounts[transaction.account_id].balance.value +=
+          transaction.amount.value;
 
-    account.available_balance = {
-      // Confirmed transfers amounts are negative
-      value:
-        limitBalance +
-        transactionsBalance +
-        confirmedTransfersBalance -
-        reservationsBalance,
-    };
+        mappedAccounts[transaction.account_id].available_balance = {
+          value: mappedAccounts[transaction.account_id].balance.value,
+          unit: "cents",
+          currency: "EUR",
+        };
+      });
+    // // .reduce(addAmountValues, 0);
+    // const confirmedTransfersBalance = queuedBookings
+    //   .filter((booking) => booking.status === "accepted")
+    //   .reduce(addAmountValues, 0);
+    // const reservationsBalance = reservations.reduce(addAmountValues, 0);
+    // const limitBalance =
+    //   (account.account_limit && account.account_limit.value) || 0;
 
-    person.account = account;
+    // if (transactionsBalance < 0 && !skipInterest) {
+    //   calculateOverdraftInterest(account, transactionsBalance);
+    // }
+
+    person.accounts = Object.values(mappedAccounts);
     person.timedOrders = person.timedOrders || [];
   }
 
@@ -339,13 +365,13 @@ export const getAllIdentifications = () => {
 
 export const findPersonByAccountField = async (findBy) => {
   const persons = await getAllPersons();
-  return persons.filter((person) => person.account).find(findBy);
+  return persons.filter((person) => person.accounts).find(findBy);
 };
 
 export const findPersonByAccountId = (accountId) =>
   findPersonByAccountField(
     (person) =>
-      person.account.id === accountId ||
+      person.accounts.some((account) => account.id === accountId) ||
       (person.billing_account || {}).id === accountId
   );
 

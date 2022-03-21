@@ -289,6 +289,7 @@ export type Reservation = {
 
 export type Booking = {
   id: string;
+  account_id: string;
   creation_date: string;
   valuta_date: string;
   booking_date: string;

@@ -336,8 +336,8 @@ export const processQueuedBooking = async (
 
   const allPersons = await getAllPersons();
   const receiver = allPersons
-    .filter((dbPerson) => dbPerson.account)
-    .find((dbPerson) => dbPerson.account.iban === booking.recipient_iban);
+    .filter((dbPerson) => dbPerson.accounts.length)
+    .find((dbPerson) => dbPerson.accounts[0].iban === booking.recipient_iban);
 
   const isDirectDebit = [
     BookingType.DIRECT_DEBIT,
@@ -345,7 +345,7 @@ export const processQueuedBooking = async (
   ].includes(booking.booking_type);
 
   const wouldOverdraw =
-    person.account.available_balance.value < booking.amount.value;
+    person.accounts[0].available_balance.value < booking.amount.value;
 
   let directDebitReturn;
   let sepaDirectDebitReturn;
@@ -396,7 +396,7 @@ export const processQueuedBooking = async (
   }
 
   await savePerson(person);
-  await triggerBookingsWebhook(person.account.id);
+  await triggerBookingsWebhook(person.accounts[0].id);
 
   if (sepaDirectDebitReturn) {
     await triggerSepaDirectDebitReturnWebhook(sepaDirectDebitReturn);
@@ -421,8 +421,8 @@ export const generateBookingForPerson = (bookingData) => {
   } = bookingData;
 
   const recipientName = `${person.salutation} ${person.first_name} ${person.last_name}`;
-  const recipientIBAN = person.account.iban;
-  const recipientBIC = person.account.bic;
+  const recipientIBAN = person.accounts[0].iban;
+  const recipientBIC = person.accounts[0].bic;
 
   const senderIBAN = iban || "ES3183888553310516236778";
   const senderBIC = process.env.SOLARIS_BIC;
