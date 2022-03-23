@@ -122,12 +122,20 @@ export const migrate = async () => {
 
     await Promise.all(
       Array.from({ length: 100 }).map((__, index) => {
-        const id = `${person.id}${index}`;
+        const formattedIndex = ("0" + index).slice(-2);
+
+        const id = `demo${formattedIndex}`;
+        const email = `demo_automat+${formattedIndex}@etvas.com`;
+        const firstName = id;
+
         const acc = seedAccount(id);
 
         return savePerson({
           ...person,
           id,
+          email,
+          first_name: firstName,
+          last_name: "Demo",
           transactions: seedTransactions(1, acc.id),
           accounts: [acc],
         });
