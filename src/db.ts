@@ -163,7 +163,7 @@ export const getPerson = async (personId) => {
 
 export const getTechnicalUserPerson = () => getPerson("demo100");
 
-// const addAmountValues = (a, b) => a + b.amount.value;
+const addAmountValues = (a, b) => a + b.amount.value;
 
 export const savePerson = async (person, skipInterest = false) => {
   person.address = person.address || { country: null };
@@ -172,9 +172,15 @@ export const savePerson = async (person, skipInterest = false) => {
 
   if (accounts.length) {
     const transactions = person.transactions || [];
-    // const queuedBookings = person.queuedBookings || [];
-    // const reservations = person.account.reservations || [];
+    const queuedBookings = person.queuedBookings || [];
+    const reservations = person.accounts[0].reservations || [];
     const now = new Date().getTime();
+
+    const confirmedTransfersBalance = queuedBookings
+      .filter((booking) => booking.status === "accepted")
+      .reduce(addAmountValues, 0);
+
+    const reservationsBalance = reservations.reduce(addAmountValues, 0);
 
     const mappedAccounts = accounts.reduce(
       (acc, account) => ({
@@ -205,24 +211,28 @@ export const savePerson = async (person, skipInterest = false) => {
           transaction.amount.value;
 
         mappedAccounts[transaction.account_id].available_balance = {
-          value: mappedAccounts[transaction.account_id].balance.value,
+          value:
+            mappedAccounts[transaction.account_id].balance.value +
+            confirmedTransfersBalance -
+            reservationsBalance,
           unit: "cents",
           currency: "EUR",
         };
       });
-    // // .reduce(addAmountValues, 0);
-    // const confirmedTransfersBalance = queuedBookings
-    //   .filter((booking) => booking.status === "accepted")
-    //   .reduce(addAmountValues, 0);
-    // const reservationsBalance = reservations.reduce(addAmountValues, 0);
-    // const limitBalance =
-    //   (account.account_limit && account.account_limit.value) || 0;
-
-    // if (transactionsBalance < 0 && !skipInterest) {
-    //   calculateOverdraftInterest(account, transactionsBalance);
-    // }
 
     person.accounts = Object.values(mappedAccounts);
+
+    person.accounts.forEach((account) => {
+      if (account.balance < 0 && !skipInterest) {
+        calculateOverdraftInterest(account, account.balance);
+      }
+
+      const limitBalance =
+        (account.account_limit && account.account_limit.value) || 0;
+
+      account.available_balance += limitBalance;
+    });
+
     person.timedOrders = person.timedOrders || [];
   }
 
