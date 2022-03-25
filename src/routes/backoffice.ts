@@ -376,6 +376,8 @@ export const processQueuedBooking = async (
     booking.amount.value = -Math.abs(booking.amount.value);
   }
 
+  booking.account_id = person.accounts[0].id;
+
   person.transactions.push(booking);
   if (directDebitReturn) {
     person.transactions.push(directDebitReturn);
