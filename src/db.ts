@@ -4,7 +4,8 @@ import Promise from "bluebird";
 import * as log from "./logger";
 import { calculateOverdraftInterest } from "./helpers/overdraft";
 import { seedTransactions } from "./seeds/transactions";
-import { seedAccount, seedAccounts } from "./seeds/accounts";
+import { seedAccount } from "./seeds/accounts";
+import { seedPersons } from "./seeds/persons";
 
 let redis;
 
@@ -28,29 +29,29 @@ redisClient.on("error", (err) => {
 
 export const migrate = async () => {
   try {
-    await getPerson("demo100");
+    await getPerson("mockpersonkontistgmbh");
     throw new Error("during development, we create it every time");
   } catch (error) {
     log.warn("kontistGmbHAccount not found, creating");
 
     const accounts = [
-      { ...seedAccount("demo100"), type: "CHECKING_BUSINESS" },
+      { ...seedAccount("mockpersonkontistgmbh"), type: "CHECKING_BUSINESS" },
       {
-        ...seedAccount("demo100"),
+        ...seedAccount("mockpersonkontistgmbh"),
         locking_status: "BLOCK",
         locking_reasons: ["COMPLIANCE"],
       },
       {
-        ...seedAccount("demo100"),
+        ...seedAccount("mockpersonkontistgmbh"),
         locking_status: "DEBIT_BLOCK",
         locking_reasons: ["COMPLIANCE"],
       },
       {
-        ...seedAccount("demo100"),
+        ...seedAccount("mockpersonkontistgmbh"),
         locking_status: "CREDIT_BLOCK",
         locking_reasons: ["COMPLIANCE"],
       },
-      { ...seedAccount("demo100") },
+      { ...seedAccount("mockpersonkontistgmbh") },
     ];
 
     const person = {
@@ -71,7 +72,7 @@ export const migrate = async () => {
       fatca_relevant: true,
       email: "kontistgmbh@mocksolaris.example.com",
       mobile_number: "+49123123223",
-      id: "demo100",
+      id: "mockpersonkontistgmbh",
       identifications: {
         "identify-mock691f4e49fc43b913bd8ede668e187e9a-1509032370615": {
           id: "identify-mock691f4e49fc43b913bd8ede668e187e9a-1509032370615",
@@ -98,15 +99,16 @@ export const migrate = async () => {
       },
       screening_progress: null,
       transactions: _.flatten(
-        accounts.map(({ id }) => seedTransactions(100, id))
+        accounts.map(({ id }) => seedTransactions(5, id))
       ),
+      account: accounts[0],
       accounts,
       billing_account: {
         id: process.env.SOLARIS_KONTIST_BILLING_ACCOUNT_ID,
         iban: "DE58110101002263909949",
         bic: process.env.SOLARIS_BIC,
         type: "CHECKING_BUSINESS",
-        person_id: "demo100",
+        person_id: "mockpersonkontistgmbh",
         balance: {
           value: 100,
         },
@@ -120,27 +122,9 @@ export const migrate = async () => {
 
     await savePerson(person);
 
-    await Promise.all(
-      Array.from({ length: 100 }).map((__, index) => {
-        const formattedIndex = ("0" + index).slice(-2);
-
-        const id = `demo${formattedIndex}`;
-        const email = `demo_automat+${formattedIndex}@etvas.com`;
-        const firstName = id;
-
-        const acc = seedAccount(id);
-
-        return savePerson({
-          ...person,
-          id,
-          email,
-          first_name: firstName,
-          last_name: "Demo",
-          transactions: seedTransactions(1, acc.id),
-          accounts: [acc],
-        });
-      })
-    );
+    if (process.env.SEED_MULTIPLE_PERSONS) {
+      await seedPersons(person, savePerson);
+    }
   }
 };
 
@@ -161,9 +145,9 @@ export const getPerson = async (personId) => {
   return augmentPerson(person);
 };
 
-export const getTechnicalUserPerson = () => getPerson("demo100");
+export const getTechnicalUserPerson = () => getPerson("mockpersonkontistgmbh");
 
-// const addAmountValues = (a, b) => a + b.amount.value;
+const addAmountValues = (a, b) => a + b.amount.value;
 
 export const savePerson = async (person, skipInterest = false) => {
   person.address = person.address || { country: null };
@@ -172,9 +156,15 @@ export const savePerson = async (person, skipInterest = false) => {
 
   if (accounts.length) {
     const transactions = person.transactions || [];
-    // const queuedBookings = person.queuedBookings || [];
-    // const reservations = person.account.reservations || [];
+    const queuedBookings = person.queuedBookings || [];
+    const reservations = person.accounts[0].reservations || [];
     const now = new Date().getTime();
+
+    const confirmedTransfersBalance = queuedBookings
+      .filter((booking) => booking.status === "accepted")
+      .reduce(addAmountValues, 0);
+
+    const reservationsBalance = reservations.reduce(addAmountValues, 0);
 
     const mappedAccounts = accounts.reduce(
       (acc, account) => ({
@@ -205,24 +195,28 @@ export const savePerson = async (person, skipInterest = false) => {
           transaction.amount.value;
 
         mappedAccounts[transaction.account_id].available_balance = {
-          value: mappedAccounts[transaction.account_id].balance.value,
+          value:
+            mappedAccounts[transaction.account_id].balance.value +
+            confirmedTransfersBalance -
+            reservationsBalance,
           unit: "cents",
           currency: "EUR",
         };
       });
-    // // .reduce(addAmountValues, 0);
-    // const confirmedTransfersBalance = queuedBookings
-    //   .filter((booking) => booking.status === "accepted")
-    //   .reduce(addAmountValues, 0);
-    // const reservationsBalance = reservations.reduce(addAmountValues, 0);
-    // const limitBalance =
-    //   (account.account_limit && account.account_limit.value) || 0;
-
-    // if (transactionsBalance < 0 && !skipInterest) {
-    //   calculateOverdraftInterest(account, transactionsBalance);
-    // }
 
     person.accounts = Object.values(mappedAccounts);
+
+    person.accounts.forEach((account) => {
+      if (account.balance < 0 && !skipInterest) {
+        calculateOverdraftInterest(account, account.balance);
+      }
+
+      const limitBalance =
+        (account.account_limit && account.account_limit.value) || 0;
+
+      account.available_balance.value += limitBalance;
+    });
+
     person.timedOrders = person.timedOrders || [];
   }
 
