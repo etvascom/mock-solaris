@@ -150,6 +150,10 @@ router.get(
   "/accounts/:account_id/bookings",
   safeRequestHandler(accountsAPI.showAccountBookings)
 );
+router.post(
+  "/accounts/:account_id/bookings",
+  safeRequestHandler(accountsAPI.createAccountBooking)
+);
 router.get(
   "/persons/:person_id/accounts/:id",
   safeRequestHandler(accountsAPI.showPersonAccount)

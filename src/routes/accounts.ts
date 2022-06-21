@@ -70,6 +70,24 @@ export const showAccountBookings = async (req, res) => {
   );
 };
 
+export const createAccountBooking = async (req, res) => {
+  const { account_id: accountId } = req.params;
+
+  const person = await findPersonByAccountId(accountId);
+
+  const newPerson = {
+    ...person,
+    transactions: [
+      ...person.transactions,
+      { ...req.body, account_id: accountId },
+    ],
+  };
+
+  await savePerson(newPerson);
+
+  return res.status(200).json({ success: true });
+};
+
 export const showAccountReservations = async (req, res) => {
   const {
     page: { size, number },

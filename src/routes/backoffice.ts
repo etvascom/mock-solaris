@@ -377,6 +377,8 @@ export const processQueuedBooking = async (
   }
 
   booking.account_id = person.accounts[0].id;
+  booking.amount.unit = "cents";
+  booking.amount.currency = "EUR";
 
   person.transactions.push(booking);
   if (directDebitReturn) {

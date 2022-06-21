@@ -29,29 +29,29 @@ redisClient.on("error", (err) => {
 
 export const migrate = async () => {
   try {
-    await getPerson("mockpersonkontistgmbh");
+    await getPerson("demo100");
     throw new Error("during development, we create it every time");
   } catch (error) {
     log.warn("kontistGmbHAccount not found, creating");
 
     const accounts = [
-      { ...seedAccount("mockpersonkontistgmbh"), type: "CHECKING_BUSINESS" },
+      { ...seedAccount("demo100"), type: "CHECKING_BUSINESS" },
       {
-        ...seedAccount("mockpersonkontistgmbh"),
+        ...seedAccount("demo100"),
         locking_status: "BLOCK",
         locking_reasons: ["COMPLIANCE"],
       },
       {
-        ...seedAccount("mockpersonkontistgmbh"),
+        ...seedAccount("demo100"),
         locking_status: "DEBIT_BLOCK",
         locking_reasons: ["COMPLIANCE"],
       },
       {
-        ...seedAccount("mockpersonkontistgmbh"),
+        ...seedAccount("demo100"),
         locking_status: "CREDIT_BLOCK",
         locking_reasons: ["COMPLIANCE"],
       },
-      { ...seedAccount("mockpersonkontistgmbh") },
+      { ...seedAccount("demo100") },
     ];
 
     const person = {
@@ -72,7 +72,7 @@ export const migrate = async () => {
       fatca_relevant: true,
       email: "kontistgmbh@mocksolaris.example.com",
       mobile_number: "+49123123223",
-      id: "mockpersonkontistgmbh",
+      id: "demo100",
       identifications: {
         "identify-mock691f4e49fc43b913bd8ede668e187e9a-1509032370615": {
           id: "identify-mock691f4e49fc43b913bd8ede668e187e9a-1509032370615",
@@ -108,7 +108,7 @@ export const migrate = async () => {
         iban: "DE58110101002263909949",
         bic: process.env.SOLARIS_BIC,
         type: "CHECKING_BUSINESS",
-        person_id: "mockpersonkontistgmbh",
+        person_id: "demo100",
         balance: {
           value: 100,
         },

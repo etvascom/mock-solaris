@@ -1,7 +1,7 @@
 import { serve } from "./app";
 import { error } from "./logger";
 
-const PORT = 2091;
+const PORT = process.env.PORT || 2091;
 
 process.on("uncaughtException", (err) => {
   error("Uncaught exception occurred. Mock server will stop", err);
