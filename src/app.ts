@@ -26,6 +26,7 @@ import * as e2eAPI from "./routes/e2e";
 import * as middlewares from "./helpers/middlewares";
 import * as overdraftAPI from "./routes/overdraft";
 import * as termsAPI from "./routes/termsAndConditions";
+import * as resetAPI from "./routes/reset";
 
 import { migrate } from "./db";
 
@@ -645,6 +646,8 @@ router.post(
   checkRequestHostHeader,
   safeRequestHandler(webhooksAPI.createWebhookHandler)
 );
+
+app.get("/reset", safeRequestHandler(resetAPI.reset));
 
 // HEALTH CHECK
 app.get("/health", (req, res) => {
