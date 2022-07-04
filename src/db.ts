@@ -32,7 +32,7 @@ export const migrate = async () => {
     await getPerson("demo100");
     throw new Error("during development, we create it every time");
   } catch (error) {
-    log.warn("Persons not found, creating");
+    log.warn("kontistGmbHAccount not found, creating");
 
     const accounts = [
       { ...seedAccount("demo100"), type: "CHECKING_BUSINESS" },
@@ -119,6 +119,8 @@ export const migrate = async () => {
         },
       },
     };
+
+    await savePerson(person);
 
     await seedPersons(person, savePerson);
   }
