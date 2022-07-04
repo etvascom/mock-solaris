@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { serve } from "./app";
 import { error } from "./logger";
 

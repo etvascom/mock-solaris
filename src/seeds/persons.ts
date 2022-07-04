@@ -1,9 +1,11 @@
 import { seedAccount } from "./accounts";
 import { seedTransactions } from "./transactions";
 
+const PERSON_COUNT = parseInt(process.env.PERSON_COUNT, 10) || 100;
+
 export const seedPersons = async (basePerson, savePerson: (person) => {}) => {
   return Promise.all(
-    Array.from({ length: 100 }).map((__, index) => {
+    Array.from({ length: PERSON_COUNT }).map((__, index) => {
       const formattedIndex = ("0" + index).slice(-2);
 
       const id = `demo${formattedIndex}`;
