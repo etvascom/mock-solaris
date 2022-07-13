@@ -138,6 +138,11 @@ const jsonToPerson = (value) => {
   return person;
 };
 
+export const resetData = async () => {
+  await redisClient.flushall();
+  await migrate();
+};
+
 export const getPerson = async (personId) => {
   const person = await redisClient
     .getAsync(`${process.env.MOCKSOLARIS_REDIS_PREFIX}:person:${personId}`)
