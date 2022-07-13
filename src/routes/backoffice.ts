@@ -435,7 +435,7 @@ export const generateBookingForPerson = (bookingData) => {
     id: uuid.v4(),
     amount: { value: parseInt(amount, 10) },
     valuta_date: valutaDate ? moment(valutaDate).format("YYYY-MM-DD") : today,
-    description: purpose,
+    description: purpose || "-",
     booking_date: bookingDate
       ? moment(bookingDate).format("YYYY-MM-DD")
       : today,
@@ -444,9 +444,9 @@ export const generateBookingForPerson = (bookingData) => {
     recipient_iban: recipientIBAN,
     recipient_name: recipientName,
     sender_bic: senderBIC,
-    sender_iban: senderIBAN,
+    sender_iban: senderIBAN || "-",
     sender_name: senderName || "mocksolaris",
-    end_to_end_id: endToEndId,
+    end_to_end_id: endToEndId || uuid.v4(),
     booking_type: bookingType,
     transaction_id: transactionId || uuid.v4(),
     return_transaction_id: null,
