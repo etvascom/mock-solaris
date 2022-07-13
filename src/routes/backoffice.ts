@@ -59,9 +59,8 @@ const triggerAccountBlockWebhook = async (person) => {
   await triggerWebhook(AccountWebhookEvent.ACCOUNT_BLOCK, payload);
 };
 
-export const triggerBookingsWebhook = async (solarisAccountId) => {
-  const payload = { account_id: solarisAccountId };
-  await triggerWebhook(TransactionWebhookEvent.BOOKING, payload);
+export const triggerBookingsWebhook = async (booking) => {
+  await triggerWebhook(TransactionWebhookEvent.BOOKING, booking);
 };
 
 /**
@@ -400,7 +399,7 @@ export const processQueuedBooking = async (
   }
 
   await savePerson(person);
-  await triggerBookingsWebhook(person.accounts[0].id);
+  await triggerBookingsWebhook(booking);
 
   if (sepaDirectDebitReturn) {
     await triggerSepaDirectDebitReturnWebhook(sepaDirectDebitReturn);
