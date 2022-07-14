@@ -436,6 +436,7 @@ export const generateBookingForPerson = (bookingData) => {
     amount: { value: parseInt(amount, 10) },
     valuta_date: valutaDate ? moment(valutaDate).format("YYYY-MM-DD") : today,
     description: purpose || "-",
+    creation_date: moment().format("YYYY-MM-DD"),
     booking_date: bookingDate
       ? moment(bookingDate).format("YYYY-MM-DD")
       : today,
