@@ -240,3 +240,17 @@ export const showAccountBalance = async (req, res) => {
 
   res.status(200).send(balance);
 };
+
+export const showAccount = async (req, res) => {
+  const { account_id: accountId } = req.params;
+
+  const person = await findPersonByAccountId(accountId);
+
+  if (!person) {
+    res.status(404).json({ error: true, message: "Cannot find account owner" });
+  }
+
+  const account = person.accounts.find((acc) => acc.id === accountId);
+
+  res.status(200).send(account);
+};

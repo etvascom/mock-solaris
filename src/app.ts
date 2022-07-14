@@ -148,6 +148,10 @@ router.put(
 
 // ACCOUNTS
 router.get(
+  "/accounts/:account_id",
+  safeRequestHandler(accountsAPI.showAccount)
+);
+router.get(
   "/accounts/:account_id/bookings",
   safeRequestHandler(accountsAPI.showAccountBookings)
 );
