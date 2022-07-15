@@ -290,6 +290,7 @@ const generateBookingFromStandingOrder = (standingOrder) => {
     ...standingOrder,
     id: uuid.v4(),
     valuta_date: moment().format("YYYY-MM-DD"),
+    recorded_at: moment().format(),
     booking_date: moment().format("YYYY-MM-DD"),
     booking_type: BookingType.SEPA_CREDIT_TRANSFER,
     amount: {
@@ -420,6 +421,7 @@ export const generateBookingForPerson = (bookingData) => {
     transactionId,
     bookingDate,
     valutaDate,
+    recordedAt,
     status,
   } = bookingData;
 
@@ -430,11 +432,13 @@ export const generateBookingForPerson = (bookingData) => {
   const senderIBAN = iban || "ES3183888553310516236778";
   const senderBIC = process.env.SOLARIS_BIC;
   const today = moment().format("YYYY-MM-DD");
+  const recordedAtTimestamp = moment().format();
 
   return {
     id: uuid.v4(),
     amount: { value: parseInt(amount, 10) },
     valuta_date: valutaDate ? moment(valutaDate).format("YYYY-MM-DD") : today,
+    recorded_at: recordedAt ? moment(recordedAt).format() : recordedAtTimestamp,
     description: purpose || "-",
     creation_date: moment().format("YYYY-MM-DD"),
     booking_date: bookingDate
@@ -534,6 +538,7 @@ export const createDirectDebitReturn = async (personId, id) => {
   }
 
   const today = moment().format("YYYY-MM-DD");
+  const recordedAtTimestamp = moment().format();
 
   const directDebitReturn = {
     ...directDebit,
@@ -554,6 +559,7 @@ export const createDirectDebitReturn = async (personId, id) => {
     },
     booking_date: today,
     valuta_date: today,
+    recorded_at: recordedAtTimestamp,
   };
 
   person.transactions.push(directDebitReturn);

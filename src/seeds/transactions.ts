@@ -8,6 +8,7 @@ export const seedTransaction = (accountId: string): Booking => ({
   creation_date: moment(falso.randPastDate()).format("YYYY-MM-DD"),
   valuta_date: moment(falso.randPastDate()).format("YYYY-MM-DD"),
   booking_date: moment(falso.randPastDate()).format("YYYY-MM-DD"),
+  recorded_at: moment(falso.randPastDate()).format(),
   booking_type: "DIRECT_DEBIT",
   amount: {
     value:
