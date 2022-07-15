@@ -292,6 +292,7 @@ export type Booking = {
   account_id: string;
   creation_date: string;
   valuta_date: string;
+  recorded_at: string;
   booking_date: string;
   booking_type: string;
   amount: Amount;
