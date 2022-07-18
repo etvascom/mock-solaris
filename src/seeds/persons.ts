@@ -2,7 +2,10 @@ import { seedAccount } from "./accounts";
 import { seedTransactions } from "./transactions";
 import _ from "lodash";
 
-const PERSON_COUNT = parseInt(process.env.PERSON_COUNT, 10) || 100;
+const PERSON_COUNT = _.clamp(
+  parseInt(process.env.PERSON_COUNT ?? "100", 10),
+  100
+);
 
 const createNewPerson = (personId: string) => {
   const accounts = [
@@ -92,13 +95,9 @@ const createNewPerson = (personId: string) => {
 
 type PersistPersonFunc = (person: any) => Promise<void>;
 
-const DIGITS_FOR_ID = PERSON_COUNT.toString().length;
-
 export const seedPersons = async (savePerson: PersistPersonFunc) => {
   _.range(0, PERSON_COUNT)
-    .map((number) =>
-      `demo`.concat(number.toString().padStart(DIGITS_FOR_ID, "0"))
-    )
+    .map((number) => `demo`.concat(number.toString().padStart(2, "0")))
     .forEach((id) =>
       savePerson({
         ...createNewPerson(id),
