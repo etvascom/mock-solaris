@@ -2,7 +2,7 @@ import { seedAccount } from "./accounts";
 import { seedTransactions } from "./transactions";
 import _ from "lodash";
 
-const PERSON_COUNT = parseInt(process.env.PERSON_COUNT, 10) || 1000;
+const PERSON_COUNT = parseInt(process.env.PERSON_COUNT, 10) || 100;
 
 const createNewPerson = (personId: string) => {
   const accounts = [
