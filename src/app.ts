@@ -655,7 +655,11 @@ app.get("/reset", safeRequestHandler(resetAPI.reset));
 
 // HEALTH CHECK
 app.get("/health", (req, res) => {
-  res.status(200).send("there is no piwo tracker!");
+  res.status(200).send("there is no health tracker!");
+});
+
+app.get("/", (req, res) => {
+  res.sendStatus(200);
 });
 
 // REST

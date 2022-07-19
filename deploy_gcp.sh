@@ -1,0 +1,1 @@
+docker buildx build -t europe-west3-docker.pkg.dev/customer-ess-deployment/mocksolaris/mocksolaris:last --platform=linux/amd64 --push . 
