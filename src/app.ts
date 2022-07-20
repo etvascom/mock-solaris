@@ -651,7 +651,7 @@ router.post(
   safeRequestHandler(webhooksAPI.createWebhookHandler)
 );
 
-app.get("/reset", safeRequestHandler(resetAPI.reset));
+router.get("/reset", safeRequestHandler(resetAPI.reset));
 
 // HEALTH CHECK
 app.get("/health", (req, res) => {
