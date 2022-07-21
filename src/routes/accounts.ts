@@ -61,7 +61,7 @@ export const showAccountBookings = async (req, res) => {
 
   const sortAccepted = ["id", "booking_date", "valuta_date", "recorded_at"];
 
-  res.status(200).send(
+  return res.status(200).send(
     transformData(transactions, {
       ...req.query,
       sort: req.query.sort || "booking_date",
@@ -231,14 +231,16 @@ export const showAccountBalance = async (req, res) => {
   const person = await findPersonByAccountId(accountId);
 
   if (!person) {
-    res.status(404).json({ error: true, message: "Cannot find account owner" });
+    return res
+      .status(404)
+      .json({ error: true, message: "Cannot find account owner" });
   }
 
   const account = person.accounts.find((acc) => acc.id === accountId);
 
   const balance = _.pick(account, ["balance", "available_balance"]);
 
-  res.status(200).send(balance);
+  return res.status(200).send(balance);
 };
 
 export const showAccount = async (req, res) => {
@@ -247,10 +249,12 @@ export const showAccount = async (req, res) => {
   const person = await findPersonByAccountId(accountId);
 
   if (!person) {
-    res.status(404).json({ error: true, message: "Cannot find account owner" });
+    return res
+      .status(404)
+      .json({ error: true, message: "Cannot find account owner" });
   }
 
   const account = person.accounts.find((acc) => acc.id === accountId);
 
-  res.status(200).send(account);
+  return res.status(200).send(account);
 };
