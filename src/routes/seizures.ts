@@ -66,7 +66,7 @@ const SEIZURE_EXAMPLE = {
 export const createSeizure = async (personId) => {
   const person = await getPerson(personId);
 
-  const today = moment().format("YYYY-MM-DD");
+  const today = moment().utc().format("YYYY-MM-DD");
   person.seizure = {
     ...SEIZURE_EXAMPLE,
     id: uuid.v4(),
