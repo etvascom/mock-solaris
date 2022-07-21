@@ -289,9 +289,9 @@ const generateBookingFromStandingOrder = (standingOrder) => {
   return {
     ...standingOrder,
     id: uuid.v4(),
-    valuta_date: moment().format("YYYY-MM-DD"),
+    valuta_date: moment().utc().format("YYYY-MM-DD"),
     recorded_at: moment().utc().format(),
-    booking_date: moment().format("YYYY-MM-DD"),
+    booking_date: moment().utc().format("YYYY-MM-DD"),
     booking_type: BookingType.SEPA_CREDIT_TRANSFER,
     amount: {
       value: -Math.abs(standingOrder.amount.value),
@@ -431,7 +431,7 @@ export const generateBookingForPerson = (bookingData) => {
 
   const senderIBAN = iban || "ES3183888553310516236778";
   const senderBIC = process.env.SOLARIS_BIC;
-  const today = moment().format("YYYY-MM-DD");
+  const today = moment().utc().format("YYYY-MM-DD");
   const recordedAtTimestamp = moment().utc().format();
 
   return {
@@ -440,7 +440,7 @@ export const generateBookingForPerson = (bookingData) => {
     valuta_date: valutaDate ? moment(valutaDate).format("YYYY-MM-DD") : today,
     recorded_at: recordedAt ? moment(recordedAt).format() : recordedAtTimestamp,
     description: purpose || "-",
-    creation_date: moment().format("YYYY-MM-DD"),
+    creation_date: moment().utc().format("YYYY-MM-DD"),
     booking_date: bookingDate
       ? moment(bookingDate).format("YYYY-MM-DD")
       : today,
@@ -537,7 +537,7 @@ export const createDirectDebitReturn = async (personId, id) => {
     throw new Error("Direct debit return already exists");
   }
 
-  const today = moment().format("YYYY-MM-DD");
+  const today = moment().utc().format("YYYY-MM-DD");
   const recordedAtTimestamp = moment().utc().format();
 
   const directDebitReturn = {
