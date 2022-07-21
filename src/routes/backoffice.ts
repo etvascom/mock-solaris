@@ -290,7 +290,7 @@ const generateBookingFromStandingOrder = (standingOrder) => {
     ...standingOrder,
     id: uuid.v4(),
     valuta_date: moment().format("YYYY-MM-DD"),
-    recorded_at: moment().format(),
+    recorded_at: moment().utc().format(),
     booking_date: moment().format("YYYY-MM-DD"),
     booking_type: BookingType.SEPA_CREDIT_TRANSFER,
     amount: {
@@ -432,7 +432,7 @@ export const generateBookingForPerson = (bookingData) => {
   const senderIBAN = iban || "ES3183888553310516236778";
   const senderBIC = process.env.SOLARIS_BIC;
   const today = moment().format("YYYY-MM-DD");
-  const recordedAtTimestamp = moment().format();
+  const recordedAtTimestamp = moment().utc().format();
 
   return {
     id: uuid.v4(),
@@ -538,7 +538,7 @@ export const createDirectDebitReturn = async (personId, id) => {
   }
 
   const today = moment().format("YYYY-MM-DD");
-  const recordedAtTimestamp = moment().format();
+  const recordedAtTimestamp = moment().utc().format();
 
   const directDebitReturn = {
     ...directDebit,

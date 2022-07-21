@@ -65,7 +65,7 @@ export const createSepaDirectDebit = async (req, res) => {
     // for simplicity we set it to current date so we don't have to wait 3+ days for DD to be visible on account statements
     booking_date: moment().format("YYYY-MM-DD"),
     valuta_date: moment().format("YYYY-MM-DD"),
-    recorded_at: moment().format(),
+    recorded_at: moment().utc().format(),
     recipient_iban: mandate.debtor_iban,
     sender_name: "Kontist GmbH",
     recipient_name: mandate.debtor_name,
@@ -213,7 +213,7 @@ export const confirmTransaction = async (req, res) => {
   }
 
   const today = moment().format("YYYY-MM-DD");
-  const recordedAtTimestamp = moment().format();
+  const recordedAtTimestamp = moment().utc().format();
 
   Object.assign(transfer, {
     transaction_id: transfer.id,
@@ -260,7 +260,7 @@ export const creteBookingFromSepaCreditTransfer = ({
   transaction_id: id,
   booking_date: moment().format("YYYY-MM-DD"),
   valuta_date: moment().format("YYYY-MM-DD"),
-  recorded_at: moment().format(),
+  recorded_at: moment().utc().format(),
   meta_info: null,
 });
 
@@ -305,7 +305,7 @@ export const creteBookingFromReservation = (person, reservation, incoming?) => {
     sender_iban: SOLARIS_CARDS_ACCOUNT.IBAN,
     booking_date: moment().format("YYYY-MM-DD"),
     valuta_date: moment().format("YYYY-MM-DD"),
-    recorded_at: moment().format(),
+    recorded_at: moment().utc().format(),
     meta_info: metaInfo,
   };
 };
