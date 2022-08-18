@@ -1,4 +1,6 @@
 import * as falso from "@ngneat/falso";
+import { createCard } from "../helpers/cards";
+import { CardType } from "../helpers/types";
 
 const correctRandomIBAN = () => {
   const ibans = [
@@ -12,30 +14,43 @@ const correctRandomIBAN = () => {
   return ibans[Math.floor(Math.random() * 4)];
 };
 
-export const seedAccount = (personId: string) => ({
-  id: falso.randUuid(),
-  iban: correctRandomIBAN(),
-  bic: "SOBKDEB2XXX",
-  type: "CHECKING_PERSONAL",
-  purpose: null,
-  locking_status: "NO_BLOCK",
-  locking_reasons: [],
-  person_id: personId,
-  account_limit: {
-    value: falso.randNumber(),
-  },
-  available_balance: {
-    value: falso.randNumber(),
-    unit: "cents",
-    currency: "EUR",
-  },
-  balance: {
-    value: falso.randNumber({ min: 1_000_000 }),
-    unit: "cents",
-    currency: "EUR",
-  },
-  overdraftInterest: falso.randNumber(),
-});
+export const seedAccount = (personId: string) => {
+  const accountId = falso.randUuid();
+  return {
+    id: accountId,
+    iban: correctRandomIBAN(),
+    bic: "SOBKDEB2XXX",
+    type: "CHECKING_PERSONAL",
+    purpose: null,
+    locking_status: "NO_BLOCK",
+    locking_reasons: [],
+    person_id: personId,
+    account_limit: {
+      value: falso.randNumber(),
+    },
+    available_balance: {
+      value: falso.randNumber(),
+      unit: "cents",
+      currency: "EUR",
+    },
+    balance: {
+      value: falso.randNumber({ min: 1_000_000 }),
+      unit: "cents",
+      currency: "EUR",
+    },
+    overdraftInterest: falso.randNumber(),
+    cards: [
+      createCard(
+        {
+          type: CardType.VIRTUAL_VISA_FREELANCE_DEBIT,
+          reference: falso.randUuid(),
+          line_1: personId,
+        },
+        { id: personId, account: { id: accountId } } as any
+      ),
+    ],
+  };
+};
 
 export const seedAccounts = (length: number, personId: string) =>
   Array.from({ length }).map(() => seedAccount(personId));

@@ -74,13 +74,19 @@ export const createAccountBooking = async (req, res) => {
   const { account_id: accountId } = req.params;
 
   const person = await findPersonByAccountId(accountId);
-  const account = person.accounts.find((account) => account.id === accountId);
+  const accountOfPerson = person.accounts.find(
+    (account) => account.id === accountId
+  );
 
   const newPerson = {
     ...person,
     transactions: [
       ...person.transactions,
-      { ...req.body, account_id: accountId, recipient_iban: account.iban },
+      {
+        ...req.body,
+        account_id: accountId,
+        recipient_iban: accountOfPerson.iban,
+      },
     ],
   };
 

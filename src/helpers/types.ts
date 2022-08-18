@@ -277,6 +277,7 @@ type Amount = {
 export type Reservation = {
   id: string;
   amount: Amount;
+  account_id: string;
   reservation_type: ReservationType;
   reference: string;
   status: ReservationStatus;

@@ -290,6 +290,7 @@ export const creteBookingFromReservation = (person, reservation, incoming?) => {
 
   return {
     id: uuid.v4(),
+    account_id: reservation.account_id,
     booking_type: BookingType.CARD_TRANSACTION,
     amount: {
       unit: "cents",
