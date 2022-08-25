@@ -8,25 +8,7 @@ const PERSON_COUNT = _.clamp(
 );
 
 const createNewPerson = (personId: string) => {
-  const accounts = [
-    { ...seedAccount(personId), type: "CHECKING_BUSINESS" },
-    {
-      ...seedAccount(personId),
-      locking_status: "BLOCK",
-      locking_reasons: ["COMPLIANCE"],
-    },
-    {
-      ...seedAccount(personId),
-      locking_status: "DEBIT_BLOCK",
-      locking_reasons: ["COMPLIANCE"],
-    },
-    {
-      ...seedAccount(personId),
-      locking_status: "CREDIT_BLOCK",
-      locking_reasons: ["COMPLIANCE"],
-    },
-    { ...seedAccount(personId) },
-  ];
+  const accounts = [{ ...seedAccount(personId) }];
 
   return {
     salutation: "MR",

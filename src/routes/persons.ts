@@ -23,7 +23,7 @@ export const createPerson = (req, res) => {
     "mock" +
     crypto.createHash("md5").update(JSON.stringify(req.body)).digest("hex");
 
-  const accounts = seedAccounts(5, personId);
+  const accounts = seedAccounts(1, personId);
 
   const person = {
     ...req.body,

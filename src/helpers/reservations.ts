@@ -129,6 +129,7 @@ const mapDataToReservation = ({
   recipient,
   cardId,
   posEntryMode,
+  accountId,
 }: {
   amount: number;
   originalAmount: number;
@@ -137,11 +138,13 @@ const mapDataToReservation = ({
   recipient: string;
   cardId: string;
   posEntryMode: POSEntryMode;
+  accountId: string;
 }): Reservation => {
   const date = moment().toDate();
 
   return {
     id: uuid.v4(),
+    account_id: accountId,
     amount: {
       value: amount,
       unit: "cents",
@@ -447,6 +450,7 @@ export const createReservation = async ({
 }) => {
   const person = await db.getPerson(personId);
   const cardData = person.account.cards.find(({ card }) => card.id === cardId);
+  const cardAccountId = cardData.card.account_id;
   const convertedAmount = Math.abs(parseInt(amount, 10));
   const cardAuthorizationPayload = {
     amount: Math.round(convertedAmount * FxRate[currency]),
@@ -456,6 +460,7 @@ export const createReservation = async ({
     recipient,
     cardId,
     posEntryMode,
+    accountId: cardAccountId,
   };
 
   const reservation = mapDataToReservation(cardAuthorizationPayload);
