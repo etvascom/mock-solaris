@@ -590,7 +590,7 @@ const bookReservation = async (person, reservation, increaseAmount) => {
 
   await resolveReservation(reservation);
 
-  await triggerBookingsWebhook(person.account.id);
+  await triggerBookingsWebhook(booking);
 };
 
 const expireReservation = async (person, reservation) => {
