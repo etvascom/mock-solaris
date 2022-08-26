@@ -236,7 +236,7 @@ export const createCard = (
   const card = {
     id,
     type,
-    status: CardStatus.PROCESSING,
+    status: CardStatus.ACTIVE,
     expiration_date: expirationDate.format("YYYY-MM-DD"),
     person_id: person.id,
     account_id: person.account.id,
