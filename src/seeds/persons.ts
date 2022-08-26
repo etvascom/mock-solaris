@@ -54,7 +54,7 @@ const createNewPerson = (personId: string) => {
       },
     },
     screening_progress: null,
-    transactions: _.flatten(accounts.map(({ id }) => seedTransactions(5, id))),
+    transactions: _.flatten(accounts.map(({ id }) => seedTransactions(1, id))),
     account: accounts[0],
     accounts,
     billing_account: {

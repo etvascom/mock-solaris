@@ -655,6 +655,8 @@ export const createReservationHandler = async (req, res) => {
     recipient,
     declineReason,
     posEntryMode,
+    description,
+    recipientIBAN,
   } = req.body;
 
   if (!personId) {
@@ -674,6 +676,8 @@ export const createReservationHandler = async (req, res) => {
     recipient,
     declineReason,
     posEntryMode,
+    description,
+    recipientIBAN,
   };
 
   const reservation = await (type === TransactionType.CREDIT_PRESENTMENT
