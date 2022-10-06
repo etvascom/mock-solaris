@@ -260,30 +260,32 @@
           </tr>
         </thead>
         {% for reservation in person.account.reservations %}
-        <tr>
-          <form id="updateReservation" action="/__BACKOFFICE__/person/{{ person.id }}/reservations/{{ reservation.id }}"
-            method="POST">
-            <td>
-              <div>
-                {{ (JSON.parse(reservation.meta_info)).cards.transaction_type }}
-              </div>
-              <input type="checkbox" id="increaseAmount" name="increaseAmount" value="false" />
-              <label for="increaseAmount">Increase amount</label>
-            </td>
-            <td>
-              <div class="form-group">
-                <select name="action">
-                  <option selected="selected" value="BOOK">BOOK</option>
-                  <option value="EXPIRE">EXPIRE</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-primary">Update now</button>
-            </td>
-            <td>{{ (JSON.parse(reservation.meta_info)).cards.transaction_date }}</td>
-            <td>{{ (reservation.amount.value / 100).toFixed(2) }} {{ reservation.amount.currency }}</td>
-            <td>{{ reservation.description }}</td>
-          </form>
-        </tr>
+          {% if reservation.status !== 'RESOLVED' %}
+          <tr>
+            <form id="updateReservation" action="/__BACKOFFICE__/person/{{ person.id }}/reservations/{{ reservation.id }}"
+              method="POST">
+              <td>
+                <div>
+                  {{ (JSON.parse(reservation.meta_info)).cards.transaction_type }}
+                </div>
+                <input type="checkbox" id="increaseAmount" name="increaseAmount" value="false" />
+                <label for="increaseAmount">Increase amount</label>
+              </td>
+              <td>
+                <div class="form-group">
+                  <select name="action">
+                    <option selected="selected" value="BOOK">BOOK</option>
+                    <option value="EXPIRE">EXPIRE</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Update now</button>
+              </td>
+              <td>{{ (JSON.parse(reservation.meta_info)).cards.transaction_date }}</td>
+              <td>{{ (reservation.amount.value / 100).toFixed(2) }} {{ reservation.amount.currency }}</td>
+              <td>{{ reservation.description }}</td>
+            </form>
+          </tr>
+          {% endif %}
         {% endfor %}
       </table>
     </div>
