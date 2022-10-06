@@ -130,7 +130,7 @@ const mapDataToReservation = ({
   cardId,
   posEntryMode,
   accountId,
-  recipientIBAN,
+  iban,
   description,
 }: {
   amount: number;
@@ -141,7 +141,7 @@ const mapDataToReservation = ({
   cardId: string;
   posEntryMode: POSEntryMode;
   accountId: string;
-  recipientIBAN: string;
+  iban: string;
   description: string;
 }): Reservation => {
   const date = moment().toDate();
@@ -169,8 +169,9 @@ const mapDataToReservation = ({
     expires_at: null,
     expired_at: null,
     resolved_at: null,
+    created_at: moment().toISOString(),
     description,
-    recipientIBAN,
+    iban,
   };
 };
 
@@ -443,7 +444,7 @@ export const createReservation = async ({
   recipient,
   declineReason,
   posEntryMode = POSEntryMode.CONTACTLESS,
-  recipientIBAN = "DE89370400440532013000",
+  iban = "DE89370400440532013000",
   description = "Transaction made",
 }: {
   personId: string;
@@ -454,7 +455,7 @@ export const createReservation = async ({
   recipient: string;
   declineReason?: CardAuthorizationDeclineReason;
   posEntryMode?: POSEntryMode;
-  recipientIBAN?: string;
+  iban?: string;
   description?: string;
 }) => {
   const person = await db.getPerson(personId);
@@ -470,7 +471,7 @@ export const createReservation = async ({
     cardId,
     posEntryMode,
     accountId: cardAccountId,
-    recipientIBAN,
+    iban,
     description,
   };
 

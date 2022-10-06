@@ -285,8 +285,9 @@ export type Reservation = {
   expires_at: string | null;
   expired_at: string | null;
   resolved_at: string | null;
+  created_at: string;
   description: string;
-  recipientIBAN: string;
+  iban: string;
 };
 
 export type Booking = {
