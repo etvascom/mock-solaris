@@ -594,8 +594,14 @@ const bookReservation = async (person, reservation, increaseAmount) => {
 
   person.transactions.push(booking);
 
-  person.account.reservations = person.account.reservations.filter(
-    (item) => item.id !== reservation.id
+  person.account.reservations = person.account.reservations.map((item) =>
+    item.id !== reservation.id
+      ? item
+      : {
+          ...item,
+          status: "RESOLVED",
+          resolved_at: moment().utc().format("YYYY-MM-DD"),
+        }
   );
 
   await db.savePerson(person);
