@@ -21,7 +21,8 @@
     "test": "npm run lint && npm run build && mocha --recursive 'dist/tests/**/*.spec.js'",
     "coverage": "nyc npm run test",
     "lint": "tslint --project .",
-    "deploy": "zx scripts/deploy.mjs"
+    "deploy": "zx scripts/deploy.mjs",
+    "deploy:dev": "ENV=dev zx scripts/deploy.mjs"
   },
   "dependencies": {
     "@ngneat/falso": "^3.0.0",

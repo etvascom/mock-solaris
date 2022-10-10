@@ -1,9 +1,14 @@
-import { appendFile } from "fs";
-import _ from "lodash";
 import moment from "moment";
 import { $ } from "zx/core";
 
 $.verbose = false;
+
+const ENV = process.env.ENV;
+
+if (!ENV) {
+  console.error("ENV environment variable was not specified");
+  process.exit(1);
+}
 
 console.log("Packaging build...");
 await $`npm run build`;
@@ -24,9 +29,9 @@ await $`aws elasticbeanstalk create-application-version --application-name Test_
 console.log(`Updating environment...`);
 await $`aws elasticbeanstalk update-environment --application-name Test_Solaris --environment-name Testsolaris-dev --version-label ${APP_VERSION_LABEL} --profile=etvas_demo`;
 
-await $`aws elasticbeanstalk wait environment-updated --application-name Test_Solaris --environment-name Testsolaris-dev --version-label ${APP_VERSION_LABEL} --profile=etvas_demo`;
+await $`aws elasticbeanstalk wait environment-updated --application-name Test_Solaris --environment-name Testsolaris-${ENV.toLowerCase()} --version-label ${APP_VERSION_LABEL} --profile=etvas_demo`;
 
 console.log(`Setting up webhooks...`);
-await fetch(`https://ebank-api-dev.etvas-automat.com/reset`);
+await fetch(`https://ebank-api-${ENV}.etvas-automat.com/reset`);
 
 console.log(`Deployment finished`);
