@@ -1,10 +1,11 @@
+import { CountryCode, IBAN } from "ibankit";
 import _ from "lodash";
 import uuid from "node-uuid";
-import { getPerson, savePerson, findPersonByAccountId } from "../db";
-import { IBAN, CountryCode } from "ibankit";
+import { findPersonByAccountId, getPerson, savePerson } from "../db";
 
-import { transformData } from "../helpers/transformData";
+import moment from "moment";
 import { cleanBookingFields } from "../helpers/booking";
+import { transformData } from "../helpers/transformData";
 
 const ACCOUNT_SNAPSHOT_SOURCE = "SOLARISBANK";
 
@@ -98,6 +99,7 @@ export const createAccountBooking = async (req, res) => {
 export const showAccountReservations = async (req, res) => {
   const {
     page: { size, number },
+    created_at = {},
     filter: { reservation_type: reservationType = "" } = {},
   } = req.query;
 
@@ -108,6 +110,14 @@ export const showAccountReservations = async (req, res) => {
     .filter((reservation) => {
       if (reservationType) {
         return reservation.reservation_type === reservationType;
+      }
+      return true;
+    })
+    .filter((reservation) => {
+      if (created_at.min) {
+        return moment(reservation.created_at).isSameOrAfter(
+          moment(created_at.min)
+        );
       }
       return true;
     })

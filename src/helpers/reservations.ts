@@ -600,7 +600,7 @@ const bookReservation = async (person, reservation, increaseAmount) => {
       : {
           ...item,
           status: "RESOLVED",
-          resolved_at: moment().utc().format("YYYY-MM-DD"),
+          resolved_at: moment().utc().toISOString(),
         }
   );
 
@@ -612,9 +612,17 @@ const bookReservation = async (person, reservation, increaseAmount) => {
 };
 
 const expireReservation = async (person, reservation) => {
-  person.account.reservations = person.account.reservations.filter(
-    (item) => item.id !== reservation.id
-  );
+  person.account.reservations = person.account.reservations.map((res) => {
+    if (res.id === reservation.id) {
+      return {
+        ...res,
+        status: "EXPIRED",
+        resolved_at: moment().utc().toISOString(),
+        expired_at: moment().utc().toISOString(),
+      };
+    }
+    return res;
+  });
 
   reservation.status = ReservationStatus.EXPIRED;
 
