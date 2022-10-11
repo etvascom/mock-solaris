@@ -259,7 +259,7 @@
             <th>Recipient</th>
           </tr>
         </thead>
-        {% for reservation in person.account.reservations %}
+        {% for reservation in person.account.openReservations %}
           {% if reservation.status !== 'RESOLVED' %}
           <tr>
             <form id="updateReservation" action="/__BACKOFFICE__/person/{{ person.id }}/reservations/{{ reservation.id }}"

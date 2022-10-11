@@ -113,7 +113,18 @@ export const listPersons = async (req, res) => {
 
 export const listPersonsCards = async (req, res) => {
   const person = await getPerson(req.params.id);
-  res.render("cards", { person });
+
+  const personWithOpenReservations = {
+    ...person,
+    account: {
+      ...person.account,
+      openReservations: person.account.reservations.filter(
+        (r) => r.status === "OPEN"
+      ),
+    },
+  };
+
+  res.render("cards", { person: personWithOpenReservations });
 };
 
 export const getPersonHandler = async (req, res) => {
