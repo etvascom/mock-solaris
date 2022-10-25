@@ -97,31 +97,10 @@ export const createAccountBooking = async (req, res) => {
 };
 
 export const showAccountReservations = async (req, res) => {
-  const {
-    page: { size, number },
-    created_at = {},
-    filter: { reservation_type: reservationType = "" } = {},
-  } = req.query;
-
   const { account_id: accountId } = req.params;
   const person = await findPersonByAccountId(accountId);
 
-  const reservations = _.get(person.account, "reservations", [])
-    .filter((reservation) => {
-      if (reservationType) {
-        return reservation.reservation_type === reservationType;
-      }
-      return true;
-    })
-    .filter((reservation) => {
-      if (created_at.min) {
-        return moment(reservation.created_at).isSameOrAfter(
-          moment(created_at.min)
-        );
-      }
-      return true;
-    })
-    .slice((number - 1) * size, number * size);
+  const reservations = _.get(person.account, "reservations", []);
 
   res.status(200).send(reservations);
 };
