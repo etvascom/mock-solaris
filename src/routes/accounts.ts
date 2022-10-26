@@ -1,7 +1,12 @@
 import { CountryCode, IBAN } from "ibankit";
 import _ from "lodash";
 import uuid from "node-uuid";
-import { findPersonByAccountId, getPerson, savePerson } from "../db";
+import {
+  findPersonByAccountId,
+  getPerson,
+  savePerson,
+  getAllPersons,
+} from "../db";
 
 import moment from "moment";
 import { cleanBookingFields } from "../helpers/booking";
@@ -72,9 +77,20 @@ export const showAccountBookings = async (req, res) => {
 };
 
 export const createAccountBooking = async (req, res) => {
-  const { account_id: accountId } = req.params;
+  const { person_id: personId, id: bookingId } = req.params;
 
-  const person = await findPersonByAccountId(accountId);
+  const allPersons = await getAllPersons();
+  const person = allPersons.find((person) => person.id === personId);
+  const transaction = person.transactions.find(
+    (transaction) => transaction.id === bookingId
+  );
+
+  if (!transaction) {
+    throw new Error(
+      `Booking with id:${bookingId} for person:${personId} was not found`
+    );
+  }
+  const accountId = transaction.account_id;
   const accountOfPerson = person.accounts.find(
     (account) => account.id === accountId
   );
