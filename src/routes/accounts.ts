@@ -80,10 +80,8 @@ export const createAccountBooking = async (req, res) => {
   const { person_id: personId, id: bookingId } = req.params;
 
   const allPersons = await getAllPersons();
-  const person = allPersons.find((person) => person.id === personId);
-  const transaction = person.transactions.find(
-    (transaction) => transaction.id === bookingId
-  );
+  const person = allPersons.find((p) => p.id === personId);
+  const transaction = person.transactions.find((t) => t.id === bookingId);
 
   if (!transaction) {
     throw new Error(
