@@ -29,6 +29,8 @@ import {
 } from "./types";
 import getFraudWatchdog from "./fraudWatchdog";
 import { proceedWithSCAChallenge } from "./scaChallenge";
+import { findPersonByAccountId } from "../db";
+import _ from "lodash";
 
 const fraudSuspected = (reason: CardAuthorizationDeclineReason) =>
   reason === CardAuthorizationDeclineReason.FRAUD_SUSPECTED;
@@ -668,4 +670,65 @@ export const updateReservation = async ({
     default:
       throw new Error("Unknown action type");
   }
+};
+
+type GetAccountReservationsArgs = {
+  filter?: {
+    id?: string[];
+    status?: string[];
+    reservation_type?: string[];
+  };
+  page?: number;
+  sort?: {
+    key?: string;
+    direction?: "asc" | "desc";
+  };
+};
+
+const RESERVATIONS_PAGE_SIZE = 10;
+
+export const arrayIncludesOrIgnoreIfUndefined = (
+  array: string[] | undefined,
+  value: string
+) => {
+  if (!array) {
+    return true;
+  }
+
+  return array.includes(value);
+};
+
+export const getAccountReservations = async (
+  accountId: string,
+  { filter, page = 1, sort }: GetAccountReservationsArgs
+) => {
+  const person = await findPersonByAccountId(accountId);
+
+  const reservations = _.get(
+    person.account,
+    "reservations",
+    []
+  ) as Reservation[];
+
+  const filteredReservations = _.filter(
+    reservations,
+    (reservation) =>
+      arrayIncludesOrIgnoreIfUndefined(filter.id, reservation.id) &&
+      arrayIncludesOrIgnoreIfUndefined(filter.status, reservation.status) &&
+      arrayIncludesOrIgnoreIfUndefined(
+        filter.reservation_type,
+        reservation.reservation_type
+      )
+  );
+
+  const sortedReservations = sort
+    ? _.orderBy(filteredReservations, sort.key, sort.direction)
+    : filteredReservations;
+
+  const paginatedReservations = _.chunk(
+    sortedReservations,
+    RESERVATIONS_PAGE_SIZE
+  );
+
+  return paginatedReservations[page - 1] ?? [];
 };

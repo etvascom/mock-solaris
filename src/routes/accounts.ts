@@ -8,8 +8,8 @@ import {
   getAllPersons,
 } from "../db";
 
-import moment from "moment";
 import { cleanBookingFields } from "../helpers/booking";
+import { getAccountReservations } from "../helpers/reservations";
 import { transformData } from "../helpers/transformData";
 
 const ACCOUNT_SNAPSHOT_SOURCE = "SOLARISBANK";
@@ -112,9 +112,25 @@ export const createAccountBooking = async (req, res) => {
 
 export const showAccountReservations = async (req, res) => {
   const { account_id: accountId } = req.params;
-  const person = await findPersonByAccountId(accountId);
+  const { page: { number = 1 } = {}, filter, sort } = req.query;
 
-  const reservations = _.get(person.account, "reservations", []);
+  const sortDirection = sort?.startsWith("-") ? "desc" : "asc";
+  const sortKey = sort?.startsWith("-") ? sort.slice(1) : sort;
+
+  const reservations = await getAccountReservations(accountId, {
+    filter: {
+      id: filter?.id?.split(","),
+      status: filter?.status?.split(","),
+      reservation_type: filter?.reservation_type?.split(","),
+    },
+    page: number,
+    sort: {
+      key: sortKey,
+      direction: sortDirection,
+    },
+  });
+
+  console.log(reservations);
 
   res.status(200).send(reservations);
 };
