@@ -130,8 +130,6 @@ export const showAccountReservations = async (req, res) => {
     },
   });
 
-  console.log(reservations);
-
   res.status(200).send(reservations);
 };
 
