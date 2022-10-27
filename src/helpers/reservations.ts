@@ -29,7 +29,6 @@ import {
 } from "./types";
 import getFraudWatchdog from "./fraudWatchdog";
 import { proceedWithSCAChallenge } from "./scaChallenge";
-import { findPersonByAccountId } from "../db";
 import _ from "lodash";
 
 const fraudSuspected = (reason: CardAuthorizationDeclineReason) =>
@@ -702,7 +701,7 @@ export const getAccountReservations = async (
   accountId: string,
   { filter, page = 1, sort }: GetAccountReservationsArgs
 ) => {
-  const person = await findPersonByAccountId(accountId);
+  const person = await db.findPersonByAccountId(accountId);
 
   const reservations = _.get(
     person.account,
