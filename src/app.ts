@@ -156,7 +156,7 @@ router.get(
   safeRequestHandler(accountsAPI.showAccountBookings)
 );
 router.post(
-  "/accounts/:person_id/bookings/:id",
+  "/accounts/:account_id/bookings",
   safeRequestHandler(accountsAPI.createAccountBooking)
 );
 router.get(
