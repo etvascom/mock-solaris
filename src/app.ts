@@ -556,6 +556,10 @@ app.post(
   safeRequestHandler(backofficeAPI.createDirectDebitReturnHandler)
 );
 app.post(
+  "/__BACKOFFICE__/createRefund/:personId/:id",
+  safeRequestHandler(backofficeAPI.createRefundHandler)
+);
+app.post(
   "/__BACKOFFICE__/updateAccountLockingStatus/:personId",
   safeRequestHandler(backofficeAPI.updateAccountLockingStatusHandler)
 );
