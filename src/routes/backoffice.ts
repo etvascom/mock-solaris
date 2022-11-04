@@ -589,9 +589,7 @@ export const createRefundHandler = async (req, res) => {
   const { personId, id } = req.params;
 
   const person = await getPerson(personId);
-  const transaction = person.transactions.find(
-    (transaction) => transaction.id === id
-  );
+  const transaction = person.transactions.find((t) => t.id === id);
 
   const today = moment().utc().format("YYYY-MM-DD");
 
