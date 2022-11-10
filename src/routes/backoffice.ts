@@ -593,6 +593,9 @@ export const createRefundHandler = async (req, res) => {
 
   const today = moment().utc().format("YYYY-MM-DD");
 
+  const meta_info = JSON.parse(transaction.meta_info);
+  meta_info.cards.transaction_type = TransactionType.PURCHASE_REVERSAL;
+
   const refundTransaction = {
     ...transaction,
     id: uuid.v4(),
@@ -607,9 +610,10 @@ export const createRefundHandler = async (req, res) => {
       unit: "cents",
       currency: "EUR",
     },
-    booking_type: TransactionType.PURCHASE_REVERSAL,
+    booking_type: BookingType.TRANSFER,
     booking_date: today,
     valuta_date: today,
+    meta_info: JSON.stringify(meta_info),
   };
 
   person.transactions.push(refundTransaction);
