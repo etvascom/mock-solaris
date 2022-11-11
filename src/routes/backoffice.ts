@@ -610,7 +610,7 @@ export const createRefundHandler = async (req, res) => {
       unit: "cents",
       currency: "EUR",
     },
-    booking_type: BookingType.TRANSFER,
+    booking_type: BookingType.CARD_TRANSACTION,
     booking_date: today,
     valuta_date: today,
     meta_info: JSON.stringify(metaInfo),

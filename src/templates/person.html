@@ -471,7 +471,7 @@
                   🔄 Create DDR
                 </button>
               </form>
-            {% elif transaction.booking_type === "CARD_TRANSACTION" %}
+            {% elif transaction.booking_type === "CARD_TRANSACTION" && transaction.amount.value < 0 %}
               <form method="POST" action="/__BACKOFFICE__/createRefund/{{ person.id }}/{{ transaction.id }}">
                 <button type="submit" class="btn btn-default">
                   🔄 Create Refund
