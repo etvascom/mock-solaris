@@ -585,6 +585,45 @@ export const createDirectDebitReturn = async (personId, id) => {
   await triggerSepaDirectDebitReturnWebhook(sepaDirectDebitReturn);
 };
 
+export const createRefundHandler = async (req, res) => {
+  const { personId, id } = req.params;
+
+  const person = await getPerson(personId);
+  const transaction = person.transactions.find((t) => t.id === id);
+
+  const today = moment().utc().format("YYYY-MM-DD");
+
+  const metaInfo = JSON.parse(transaction.meta_info);
+  metaInfo.cards.transaction_type = TransactionType.PURCHASE_REVERSAL;
+
+  const refundTransaction = {
+    ...transaction,
+    id: uuid.v4(),
+    sender_iban: transaction.recipient_iban,
+    recipient_iban: transaction.sender_iban,
+    sender_name: transaction.recipient_name,
+    recipient_name: transaction.sender_name,
+    sender_bic: transaction.recipient_bic,
+    recipient_bic: transaction.sender_bic,
+    amount: {
+      value: -transaction.amount.value,
+      unit: "cents",
+      currency: "EUR",
+    },
+    booking_type: BookingType.CARD_TRANSACTION,
+    booking_date: today,
+    valuta_date: today,
+    meta_info: JSON.stringify(metaInfo),
+  };
+
+  person.transactions.push(refundTransaction);
+
+  await savePerson(person);
+  await triggerBookingsWebhook(refundTransaction);
+
+  res.redirect("back");
+};
+
 export const updateAccountLockingStatus = async (personId, lockingStatus) => {
   const person = await getPerson(personId);
 
