@@ -458,16 +458,32 @@ export const generateBookingForPerson = (bookingData) => {
     name: `mocksolaris-transaction-${purpose}`,
     recipient_bic: recipientBIC,
     recipient_iban: recipientIBAN,
-    recipient_name: recipientName,
+    recipient_name: getRecipientName(),
     sender_bic: senderBIC,
     sender_iban: senderIBAN || "-",
-    sender_name: senderName || "mocksolaris",
+    sender_name: getSenderName(),
     end_to_end_id: endToEndId || uuid.v4(),
     booking_type: bookingType,
     transaction_id: transactionId || uuid.v4(),
     return_transaction_id: null,
     status,
   };
+
+  function getRecipientName() {
+    return isDirectDebitBookingType() ? senderName : recipientName;
+  }
+
+  function getSenderName() {
+    return (
+      (isDirectDebitBookingType() ? recipientName : senderName) || "mocksolaris"
+    );
+  }
+
+  function isDirectDebitBookingType() {
+    return [BookingType.DIRECT_DEBIT, BookingType.SEPA_DIRECT_DEBIT].includes(
+      bookingType
+    );
+  }
 };
 
 export const queueBookingRequestHandler = async (req, res) => {
