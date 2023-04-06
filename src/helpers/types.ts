@@ -376,6 +376,7 @@ export type CardTransaction = {
     country_code: string;
     category_code: string;
     name: string;
+    iban: string;
   };
   amount: Amount;
   original_amount: Amount;
