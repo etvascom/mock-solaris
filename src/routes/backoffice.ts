@@ -382,10 +382,10 @@ export const processQueuedBooking = async (
         },
       };
     }
-
-    // direct debits come with a negative value
-    booking.amount.value = -Math.abs(booking.amount.value);
   }
+
+  // all queued bookings should have negative amounts
+  booking.amount.value = -Math.abs(booking.amount.value);
 
   booking.account_id = person.accounts[0].id;
   booking.amount.unit = "cents";
