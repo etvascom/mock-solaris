@@ -384,6 +384,19 @@ export const processQueuedBooking = async (
     }
   }
 
+  if (booking.booking_type === BookingType.SEPA_CREDIT_TRANSFER) {
+    const senderIBAN = booking.sender_iban;
+    const senderBIC = booking.sender_bic;
+    const senderName = booking.sender_name;
+
+    booking.sender_iban = booking.recipient_iban;
+    booking.sender_bic = booking.recipient_bic;
+    booking.sender_name = booking.recipient_name;
+    booking.recipient_iban = senderIBAN;
+    booking.recipient_bic = senderBIC;
+    booking.recipient_name = senderName;
+  }
+
   booking.account_id = person.accounts[0].id;
   booking.amount.unit = "cents";
   booking.amount.currency = "EUR";
