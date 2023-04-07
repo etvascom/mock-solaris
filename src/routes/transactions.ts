@@ -287,8 +287,10 @@ export const creteBookingFromReservation = (person, reservation, incoming?) => {
   const metaInfo = incoming
     ? reservation.meta_info
     : changeAmountSign(reservation.meta_info);
-
-  const recipientName = JSON.parse(reservation.meta_info).cards.merchant.name;
+  const merchant = JSON.parse(metaInfo).cards.merchant;
+  const senderName = merchant.name;
+  const senderIBAN = merchant.iban;
+  const recipientName = `${person.salutation} ${person.first_name} ${person.last_name}`;
 
   return {
     id: uuid.v4(),
@@ -299,13 +301,13 @@ export const creteBookingFromReservation = (person, reservation, incoming?) => {
       currency: "EUR",
       value: amount,
     },
-    description: reservation.description || recipientName,
+    description: reservation.description || senderName,
     recipient_bic: person.account.bic,
     recipient_iban: reservation.recipientIBAN || "DE89370400440532013000",
     recipient_name: recipientName,
     sender_bic: process.env.SOLARIS_BIC,
-    sender_name: SOLARIS_CARDS_ACCOUNT.NAME,
-    sender_iban: SOLARIS_CARDS_ACCOUNT.IBAN,
+    sender_name: senderName || SOLARIS_CARDS_ACCOUNT.NAME,
+    sender_iban: senderIBAN || SOLARIS_CARDS_ACCOUNT.IBAN,
     booking_date: moment().utc().format("YYYY-MM-DD"),
     valuta_date: moment().utc().format("YYYY-MM-DD"),
     recorded_at: moment().utc().format(),

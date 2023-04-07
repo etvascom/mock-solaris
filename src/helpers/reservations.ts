@@ -83,7 +83,8 @@ export const markReservationAsFraud = async (
 export const generateMetaInfo = ({
   originalAmount,
   originalCurrency,
-  recipient,
+  sender,
+  senderIBAN,
   cardId,
   date,
   type,
@@ -92,7 +93,8 @@ export const generateMetaInfo = ({
 }: {
   originalAmount: number;
   originalCurrency: string;
-  recipient: string;
+  sender: string;
+  senderIBAN: string;
   cardId: string;
   date: Date;
   type: TransactionType;
@@ -105,7 +107,8 @@ export const generateMetaInfo = ({
       merchant: {
         country_code: "DE",
         category_code: "7392",
-        name: recipient,
+        name: sender,
+        iban: senderIBAN,
         town: "Berlin",
       },
       original_amount: {
@@ -127,7 +130,8 @@ const mapDataToReservation = ({
   originalAmount,
   originalCurrency,
   type,
-  recipient,
+  sender,
+  senderIBAN,
   cardId,
   posEntryMode,
   accountId,
@@ -138,7 +142,8 @@ const mapDataToReservation = ({
   originalAmount: number;
   originalCurrency: string;
   type: TransactionType;
-  recipient: string;
+  sender: string;
+  senderIBAN?: string;
   cardId: string;
   posEntryMode: POSEntryMode;
   accountId: string;
@@ -161,7 +166,8 @@ const mapDataToReservation = ({
     meta_info: generateMetaInfo({
       originalAmount,
       originalCurrency,
-      recipient,
+      sender,
+      senderIBAN,
       cardId,
       date,
       type,
@@ -181,7 +187,8 @@ const mapDataToCardAuthorizationDeclined = ({
   originalAmount,
   originalCurrency,
   type,
-  recipient,
+  sender,
+  senderIBAN,
   cardId,
   posEntryMode,
 }: {
@@ -189,7 +196,8 @@ const mapDataToCardAuthorizationDeclined = ({
   originalAmount: number;
   originalCurrency: string;
   type: TransactionType;
-  recipient: string;
+  sender: string;
+  senderIBAN?: string;
   cardId: string;
   posEntryMode: POSEntryMode;
 }): CardTransaction => {
@@ -202,7 +210,8 @@ const mapDataToCardAuthorizationDeclined = ({
     merchant: {
       country_code: "DE",
       category_code: "5999",
-      name: recipient,
+      name: sender,
+      iban: senderIBAN,
     },
     amount: {
       currency: "EUR",
@@ -442,7 +451,8 @@ export const createReservation = async ({
   amount,
   currency,
   type,
-  recipient,
+  sender,
+  senderIBAN,
   declineReason,
   posEntryMode = POSEntryMode.CONTACTLESS,
   iban = "DE89370400440532013000",
@@ -453,9 +463,10 @@ export const createReservation = async ({
   amount: string;
   currency: string;
   type: TransactionType;
-  recipient: string;
+  sender: string;
   declineReason?: CardAuthorizationDeclineReason;
   posEntryMode?: POSEntryMode;
+  senderIBAN?: string;
   iban?: string;
   description?: string;
 }) => {
@@ -468,7 +479,8 @@ export const createReservation = async ({
     originalAmount: convertedAmount,
     originalCurrency: currency,
     type,
-    recipient,
+    sender,
+    senderIBAN,
     cardId,
     posEntryMode,
     accountId: cardAccountId,

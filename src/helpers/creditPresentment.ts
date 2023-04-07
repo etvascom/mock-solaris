@@ -19,14 +19,16 @@ export const createCreditPresentment = async ({
   amount,
   currency,
   type,
-  recipient,
+  sender,
+  senderIBAN,
 }: {
   personId: string;
   cardId: string;
   amount: string;
   currency: string;
   type: TransactionType;
-  recipient: string;
+  sender: string;
+  senderIBAN: string;
   declineReason?: CardAuthorizationDeclineReason;
 }) => {
   const person = await db.getPerson(personId);
@@ -42,7 +44,8 @@ export const createCreditPresentment = async ({
   const metaInfo = generateMetaInfo({
     originalAmount: convertedAmount,
     originalCurrency: currency,
-    recipient,
+    sender,
+    senderIBAN,
     cardId,
     date,
     type,
@@ -54,7 +57,7 @@ export const createCreditPresentment = async ({
     person,
     {
       amount: { value: Math.round(convertedAmount * FxRate[currency]) },
-      description: recipient,
+      description: sender,
       meta_info: metaInfo,
     },
     true
