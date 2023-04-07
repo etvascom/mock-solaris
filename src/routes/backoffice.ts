@@ -384,9 +384,6 @@ export const processQueuedBooking = async (
     }
   }
 
-  // all queued bookings should have negative amounts
-  booking.amount.value = -Math.abs(booking.amount.value);
-
   booking.account_id = person.accounts[0].id;
   booking.amount.unit = "cents";
   booking.amount.currency = "EUR";
