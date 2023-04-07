@@ -382,9 +382,6 @@ export const processQueuedBooking = async (
         },
       };
     }
-
-    // direct debits come with a negative value
-    booking.amount.value = -Math.abs(booking.amount.value);
   }
 
   booking.account_id = person.accounts[0].id;
@@ -702,11 +699,11 @@ export const createReservationHandler = async (req, res) => {
     amount,
     currency,
     type,
-    recipient,
+    sender,
     declineReason,
     posEntryMode,
     description,
-    recipientIBAN,
+    senderIBAN,
   } = req.body;
 
   if (!personId) {
@@ -723,11 +720,11 @@ export const createReservationHandler = async (req, res) => {
     amount,
     currency,
     type,
-    recipient,
+    sender,
     declineReason,
     posEntryMode,
     description,
-    recipientIBAN,
+    senderIBAN,
   };
 
   const reservation = await (type === TransactionType.CREDIT_PRESENTMENT

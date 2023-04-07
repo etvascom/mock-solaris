@@ -171,7 +171,7 @@
 
           <div class="form-group">
             <label class="col-form-label" for="amount">Amount (in cents)</label>
-            <input class="form-control" type="number" name="amount" placeholder="100" autocomplete="off" required />
+            <input id="amount" class="form-control" type="number" name="amount" placeholder="100" autocomplete="off" required />
           </div>
 
           <div class="form-group">
@@ -183,13 +183,13 @@
           </div>
 
           <div class="form-group">
-            <label class="col-form-label" for="recipient">Recipient</label>
-            <input class="form-control" type="text" name="recipient" value="Willy Wonka" required />
+            <label class="col-form-label" for="sender">Sender</label>
+            <input class="form-control" type="text" name="sender" value="Willy Wonka" required />
           </div>
 
           <div class="form-group">
-            <label class="col-form-label" for="recipientIBAN">Recipient IBAN</label>
-            <input class="form-control" type="text" name="recipientIBAN" />
+            <label class="col-form-label" for="senderIBAN">Sender IBAN</label>
+            <input class="form-control" type="text" name="senderIBAN" />
           </div>
 
           <div class="form-group">
@@ -318,6 +318,11 @@
   $(".autosubmitonchange").change(function() {
     this.submit();
   });
+
+  $("#createReservation").on('submit', function (event) {
+    const amount = parseInt($("#amount").val());
+    $("#amount").val(-Math.abs(amount));
+  })
 </script>
 
 {% endblock %}

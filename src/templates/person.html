@@ -113,10 +113,10 @@
     <div class="panel panel-default">
       <div class="panel-heading"><h4>Enqueue a new booking</h4></div>
       <div class="panel-body">
-        <form method="POST" action="/__BACKOFFICE__/queueBooking/{{ person.id }}">
+        <form id="form" method="POST" action="/__BACKOFFICE__/queueBooking/{{ person.id }}">
           <div class="form-group">
             <label>Amount (in cents)</label>
-            <input class="form-control" type="number" name="amount" placeholder="amount (in cents)" autocomplete="off" required min="-10000000" max="10000000" />
+            <input id="amount" class="form-control" type="number" name="amount" placeholder="amount (in cents)" autocomplete="off" required min="-10000000" max="10000000" />
           </div>
           <div class="form-group">
             <label>Sender</label>
@@ -745,6 +745,12 @@
 $(".autosubmitonchange").change(function() {
   this.submit();
 });
+
+$("#form").on('submit', function (event) {
+    const amount = parseInt($("#amount").val());
+    $("#amount").val(-Math.abs(amount));
+  })
+
 </script>
 
 {% endblock %}
