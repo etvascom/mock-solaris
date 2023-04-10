@@ -75,15 +75,23 @@ export const triggerWebhook = async (type, payload, extraHeaders = {}) => {
     ...payload,
   };
 
-  headers = {
-    ...headers,
-    "solaris-entity-id": body.id,
-    "solaris-webhook-attempt": "1",
-    "solaris-webhook-event-type": type,
-    "solaris-webhook-id": uuid.v4(),
-    "solaris-webhook-subscription-id": "STATIC-SUBSCRIPTION",
-    ...extraHeaders,
-  };
+  if (WEBHOOK_SECRETS[type]) {
+    const solarisWebhookSignature = generateSolarisWebhookSignature(
+      body,
+      WEBHOOK_SECRETS[type]
+    );
+
+    headers = {
+      ...headers,
+      "solaris-entity-id": body.id,
+      "solaris-webhook-attempt": "1",
+      "solaris-webhook-event-type": type,
+      "solaris-webhook-id": uuid.v4(),
+      "solaris-webhook-signature": solarisWebhookSignature,
+      "solaris-webhook-subscription-id": "STATIC-SUBSCRIPTION",
+      ...extraHeaders,
+    };
+  }
 
   await fetch(webhook.url, {
     method: "POST",
