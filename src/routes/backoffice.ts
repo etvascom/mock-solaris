@@ -717,6 +717,7 @@ export const createReservationHandler = async (req, res) => {
     posEntryMode,
     description,
     senderIBAN,
+    merchantId,
   } = req.body;
 
   if (!personId) {
@@ -738,6 +739,7 @@ export const createReservationHandler = async (req, res) => {
     posEntryMode,
     description,
     senderIBAN,
+    merchantId,
   };
 
   const reservation = await (type === TransactionType.CREDIT_PRESENTMENT
