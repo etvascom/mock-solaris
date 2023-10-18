@@ -536,27 +536,18 @@ export const queueBookingRequestHandler = async (req, res) => {
 
 export const createDirectDebitReturnHandler = async (req, res) => {
   const { personId, id } = req.params;
+  const { amount } = req.body;
 
-  await createDirectDebitReturn(personId, id);
+  await createDirectDebitReturn(personId, id, amount);
   res.redirect("back");
 };
 
-export const createDirectDebitReturn = async (personId, id) => {
+export const createDirectDebitReturn = async (personId, id, amount) => {
   const person = await getPerson(personId);
   const directDebit = person.transactions.find(
     (transaction) => transaction.id === id
   );
   const directDebitReturnId = directDebit.id.split("-").reverse().join("-");
-
-  if (
-    person.transactions.some(
-      (transaction) =>
-        transaction.id === directDebitReturnId &&
-        transaction.booking_type === BookingType.SEPA_DIRECT_DEBIT_RETURN
-    )
-  ) {
-    throw new Error("Direct debit return already exists");
-  }
 
   const today = moment().utc().format("YYYY-MM-DD");
   const recordedAtTimestamp = moment().utc().format();
@@ -574,7 +565,7 @@ export const createDirectDebitReturn = async (personId, id) => {
     return_transaction_id: directDebit.transaction_id,
     booking_type: BookingType.SEPA_DIRECT_DEBIT_RETURN,
     amount: {
-      value: -directDebit.amount.value,
+      value: -(amount || directDebit.amount.value),
       unit: "cents",
       currency: "EUR",
     },
@@ -597,6 +588,7 @@ export const createDirectDebitReturn = async (personId, id) => {
 
 export const createRefundHandler = async (req, res) => {
   const { personId, id } = req.params;
+  const { amount } = req.body;
 
   const person = await getPerson(personId);
   const transaction = person.transactions.find((t) => t.id === id);
@@ -616,7 +608,7 @@ export const createRefundHandler = async (req, res) => {
     sender_bic: transaction.recipient_bic,
     recipient_bic: transaction.sender_bic,
     amount: {
-      value: -transaction.amount.value,
+      value: -(amount || transaction.amount.value),
       unit: "cents",
       currency: "EUR",
     },

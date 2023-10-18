@@ -464,18 +464,24 @@
           {{ transaction.sender_iban }}<br>
           {{ transaction.sender_bic }}
         </td>
-        <td>
+        <td style="display: flex;">
             {% if transaction.booking_type === "DIRECT_DEBIT" %}
-              <form method="POST" action="/__BACKOFFICE__/createDirectDebitReturn/{{ person.id }}/{{ transaction.id }}">
-                <button type="submit" class="btn btn-default">
-                  🔄 Create DDR
-                </button>
-              </form>
+              <form id="ddrForm" method="POST" action="/__BACKOFFICE__/createDirectDebitReturn/{{ person.id }}/{{ transaction.id }}">
+                <div style="display: flex; flex-direction: column;">
+                  <input id="ddrAmount" style="margin-bottom: 4px;" class="form-control" type="number" name="amount" placeholder="amount" autocomplete="off" min="0" max="{{ Math.abs(transaction.amount.value) }}" style="min-width: 100px;" />
+                  <button type="submit" class="btn btn-default">
+                    🔄 Create DDR
+                  </button>
+                </div>
+              </form> 
             {% elif transaction.booking_type === "CARD_TRANSACTION" && transaction.amount.value < 0 %}
-              <form method="POST" action="/__BACKOFFICE__/createRefund/{{ person.id }}/{{ transaction.id }}">
-                <button type="submit" class="btn btn-default">
-                  🔄 Create Refund
-                </button>
+              <form id="refundForm" method="POST" action="/__BACKOFFICE__/createRefund/{{ person.id }}/{{ transaction.id }}" >
+                <div style="display: flex; flex-direction: column;">
+                  <input id="refundAmount" style="margin-bottom: 4px;" class="form-control" type="number" name="amount" placeholder="amount" autocomplete="off" min="0" max="{{ Math.abs(transaction.amount.value) }}" style="min-width: 100px;" />
+                  <button type="submit" class="btn btn-default">
+                    🔄 Create Refund
+                  </button>
+                </div>
               </form>
             {% endif %}
         </td>
@@ -747,9 +753,20 @@ $(".autosubmitonchange").change(function() {
 });
 
 $("#form").on('submit', function (event) {
-    const amount = parseInt($("#amount").val());
-    $("#amount").val(-Math.abs(amount));
-  })
+  const amount = parseInt($("#amount").val());
+  $("#amount").val(-Math.abs(amount));
+})
+
+$("#refundForm").on('submit', function (event) {
+  const amount = parseInt($("#refundAmount").val());
+  $("#refundAmount").val(-Math.abs(amount));
+})
+
+$("#ddrForm").on('submit', function (event) {
+  const amount = parseInt($("#ddrAmount").val());
+  $("#ddrAmount").val(-Math.abs(amount));
+})
+
 
 </script>
 
