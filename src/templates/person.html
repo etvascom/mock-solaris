@@ -466,18 +466,18 @@
         </td>
         <td style="display: flex;">
             {% if transaction.booking_type === "DIRECT_DEBIT" %}
-              <form id="ddrForm" method="POST" action="/__BACKOFFICE__/createDirectDebitReturn/{{ person.id }}/{{ transaction.id }}">
+              <form class="ddrForm" method="POST" action="/__BACKOFFICE__/createDirectDebitReturn/{{ person.id }}/{{ transaction.id }}">
                 <div style="display: flex; flex-direction: column;">
-                  <input id="ddrAmount" style="margin-bottom: 4px;" class="form-control" type="number" name="amount" placeholder="amount" autocomplete="off" min="0" max="{{ Math.abs(transaction.amount.value) }}" style="min-width: 100px;" />
+                  <input style="margin-bottom: 4px;" class="ddrAmount form-control" type="number" name="amount" placeholder="amount" autocomplete="off" min="0" max="{{ Math.abs(transaction.amount.value) }}" style="min-width: 100px;" />
                   <button type="submit" class="btn btn-default">
                     🔄 Create DDR
                   </button>
                 </div>
               </form> 
             {% elif transaction.booking_type === "CARD_TRANSACTION" && transaction.amount.value < 0 %}
-              <form id="refundForm" method="POST" action="/__BACKOFFICE__/createRefund/{{ person.id }}/{{ transaction.id }}" >
+              <form class="refundForm" method="POST" action="/__BACKOFFICE__/createRefund/{{ person.id }}/{{ transaction.id }}" >
                 <div style="display: flex; flex-direction: column;">
-                  <input id="refundAmount" style="margin-bottom: 4px;" class="form-control" type="number" name="amount" placeholder="amount" autocomplete="off" min="0" max="{{ Math.abs(transaction.amount.value) }}" style="min-width: 100px;" />
+                  <input style="margin-bottom: 4px;" class="refundAmount form-control" type="number" name="amount" placeholder="amount" autocomplete="off" min="0" max="{{ Math.abs(transaction.amount.value) }}" style="min-width: 100px;" />
                   <button type="submit" class="btn btn-default">
                     🔄 Create Refund
                   </button>
@@ -757,14 +757,18 @@ $("#form").on('submit', function (event) {
   $("#amount").val(-Math.abs(amount));
 })
 
-$("#refundForm").on('submit', function (event) {
-  const amount = parseInt($("#refundAmount").val());
-  $("#refundAmount").val(-Math.abs(amount));
+$(".refundForm").on('submit', function (event) {
+  const amountElement = $(this).find(".refundAmount").first()
+
+  const amount = parseInt(amountElement.val());
+  amountElement.val(-Math.abs(amount));
 })
 
-$("#ddrForm").on('submit', function (event) {
-  const amount = parseInt($("#ddrAmount").val());
-  $("#ddrAmount").val(-Math.abs(amount));
+$(".ddrForm").on('submit', function (event) {
+  const amountElement = $(this).find(".ddrAmount").first()
+
+  const amount = parseInt(amountElement.val());
+  amountElement.val(-Math.abs(amount));
 })
 
 
