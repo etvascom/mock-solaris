@@ -656,6 +656,7 @@ router.post(
 );
 
 router.get("/reset", safeRequestHandler(resetAPI.reset));
+router.get("/reset/:person_id", safeRequestHandler(resetAPI.resetPerson));
 
 // HEALTH CHECK
 app.get("/health", (req, res) => {

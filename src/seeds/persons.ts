@@ -78,11 +78,14 @@ const createNewPerson = (personId: string) => {
 type PersistPersonFunc = (person: any) => Promise<void>;
 
 export const seedPersons = async (savePerson: PersistPersonFunc) => {
-  _.range(0, PERSON_COUNT)
-    .map((number) => `demo`.concat(number.toString().padStart(2, "0")))
-    .forEach((id) =>
-      savePerson({
-        ...createNewPerson(id),
-      })
-    );
+  [
+    ..._.range(0, PERSON_COUNT).map((number) =>
+      `demo`.concat(number.toString().padStart(2, "0"))
+    ),
+    "e2e",
+  ].forEach((id) =>
+    savePerson({
+      ...createNewPerson(id),
+    })
+  );
 };

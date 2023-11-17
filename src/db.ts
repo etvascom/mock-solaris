@@ -4,6 +4,8 @@ import Promise from "bluebird";
 import * as log from "./logger";
 import { calculateOverdraftInterest } from "./helpers/overdraft";
 import { seedPersons } from "./seeds/persons";
+import { seedAccount } from "./seeds/accounts";
+import { seedTransactions } from "./seeds/transactions";
 
 let redis;
 
@@ -42,6 +44,26 @@ const jsonToPerson = (value) => {
 export const resetData = async () => {
   await redisClient.flushall();
   await migrate();
+};
+
+export const resetPersonData = async (personId: string) => {
+  const persons = await getAllPersons();
+  const person = persons
+    .filter((p) => p.accounts)
+    .find((p) => p.id === personId);
+
+  if (!person) {
+    return;
+  }
+
+  person.account = seedAccount(personId);
+  person.accounts = [person.account];
+
+  person.transactions = _.flatten(
+    person.accounts.map(({ id }) => seedTransactions(1, id))
+  );
+
+  await savePerson(person);
 };
 
 export const getPerson = async (personId) => {
