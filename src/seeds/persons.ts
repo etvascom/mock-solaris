@@ -82,7 +82,10 @@ export const seedPersons = async (savePerson: PersistPersonFunc) => {
     ..._.range(0, PERSON_COUNT).map((number) =>
       `demo`.concat(number.toString().padStart(2, "0"))
     ),
-    "e2e",
+    ..._.range(0, PERSON_COUNT).map((number) =>
+      `e2e`.concat(number.toString().padStart(2, "0"))
+    ),
+    "e2e-no-reward",
   ].forEach((id) =>
     savePerson({
       ...createNewPerson(id),
