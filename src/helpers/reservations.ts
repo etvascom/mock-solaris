@@ -602,16 +602,25 @@ const resolveReservation = async (reservation) => {
   );
 };
 
-const bookReservation = async (person, reservation, increaseAmount) => {
+const bookReservation = async (
+  person,
+  reservation,
+  increaseAmount,
+  decreaseAmount
+) => {
   let additionalAmount = 0;
 
+  const amountModPercentage = 50 / 100;
+
   if (increaseAmount) {
-    const availableBalance = person.account.available_balance.value;
+    additionalAmount = Math.floor(
+      reservation.amount.value * amountModPercentage
+    );
+  }
+
+  if (decreaseAmount) {
     additionalAmount =
-      1 +
-      Math.floor(
-        Math.random() * ((availableBalance - reservation.amount.value) / 20)
-      );
+      -1 * Math.floor(reservation.amount.value * amountModPercentage);
   }
 
   const booking = creteBookingFromReservation(person, {
@@ -669,11 +678,13 @@ export const updateReservation = async ({
   reservationId,
   action,
   increaseAmount,
+  decreaseAmount,
 }: {
   personId: string;
   reservationId: string;
   action: ActionType;
   increaseAmount?: boolean;
+  decreaseAmount?: boolean;
 }) => {
   const person = await db.getPerson(personId);
 
@@ -690,7 +701,12 @@ export const updateReservation = async ({
       return resolveReservation(reservation);
     }
     case ActionType.BOOK: {
-      return bookReservation(person, reservation, increaseAmount);
+      return bookReservation(
+        person,
+        reservation,
+        increaseAmount,
+        decreaseAmount
+      );
     }
     case ActionType.EXPIRE: {
       return expireReservation(person, reservation);
