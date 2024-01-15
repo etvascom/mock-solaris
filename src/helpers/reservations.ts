@@ -610,18 +610,17 @@ const bookReservation = async (
 ) => {
   let additionalAmount = 0;
 
+  const amountModPercentage = 50 / 100;
+
   if (increaseAmount) {
-    const availableBalance = person.account.available_balance.value;
-    additionalAmount =
-      1 +
-      Math.floor(
-        Math.random() * ((availableBalance - reservation.amount.value) / 20)
-      );
+    additionalAmount = Math.floor(
+      reservation.amount.value * amountModPercentage
+    );
   }
 
   if (decreaseAmount) {
     additionalAmount =
-      -1 * (1 + Math.random() * reservation.amount.value * 0.98);
+      -1 * Math.floor(reservation.amount.value * amountModPercentage);
   }
 
   const booking = creteBookingFromReservation(person, {
