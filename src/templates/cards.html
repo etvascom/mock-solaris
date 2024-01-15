@@ -1261,8 +1261,14 @@
                 <div>
                   {{ (JSON.parse(reservation.meta_info)).cards.transaction_type }}
                 </div>
-                <input type="checkbox" id="increaseAmount" name="increaseAmount" value="false" />
-                <label for="increaseAmount">Increase amount</label>
+                <div>
+                  <input type="checkbox" id="increaseAmount" name="increaseAmount" value="false" />
+                  <label for="increaseAmount">Increase amount</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="decreaseAmount" name="decreaseAmount" value="false" />
+                  <label for="decreaseAmount">Decrease amount</label>
+                </div>
               </td>
               <td>
                 <div class="form-group">
