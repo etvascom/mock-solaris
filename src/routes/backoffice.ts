@@ -303,6 +303,7 @@ const generateBookingFromStandingOrder = (standingOrder) => {
     valuta_date: moment().utc().format("YYYY-MM-DD"),
     recorded_at: moment().utc().format(),
     booking_date: moment().utc().format("YYYY-MM-DD"),
+    creation_date: moment().utc().format("YYYY-MM-DD"),
     booking_type: BookingType.SEPA_CREDIT_TRANSFER,
     amount: {
       value: -Math.abs(standingOrder.amount.value),
@@ -570,6 +571,7 @@ export const createDirectDebitReturn = async (personId, id, amount) => {
       currency: "EUR",
     },
     booking_date: today,
+    creation_date: today,
     valuta_date: today,
     recorded_at: recordedAtTimestamp,
   };
@@ -614,6 +616,7 @@ export const createRefundHandler = async (req, res) => {
     },
     booking_type: BookingType.CARD_TRANSACTION,
     booking_date: today,
+    creation_date: today,
     valuta_date: today,
     meta_info: JSON.stringify(metaInfo),
   };

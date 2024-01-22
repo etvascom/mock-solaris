@@ -48,6 +48,7 @@ const mapTimedOrderToTransaction = (timedOrder) => {
     },
     valuta_date: executedAt,
     booking_date: executedAt,
+    creation_date: executedAt,
     recipient_iban: recipientIBAN,
     recipient_name: recipientName,
     recipient_bic: recipientBIC,
@@ -190,7 +191,10 @@ export const authorizeTimedOrder = async (req, res) => {
   res.status(HttpStatusCodes.CREATED).send(timedOrder);
 };
 
-export const confirmTimedOrder = async (req: express.Request, res: express.Response) => {
+export const confirmTimedOrder = async (
+  req: express.Request,
+  res: express.Response
+) => {
   const { person_id: personId, id } = req.params;
   const { authorization_token: token } = req.body;
   const person = await getPerson(personId);

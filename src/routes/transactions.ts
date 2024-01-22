@@ -64,6 +64,7 @@ export const createSepaDirectDebit = async (req, res) => {
       : process.env.KONTIST_DD_BILLING_IBAN,
     // for simplicity we set it to current date so we don't have to wait 3+ days for DD to be visible on account statements
     booking_date: moment().utc().format("YYYY-MM-DD"),
+    creation_date: moment().utc().format("YYYY-MM-DD"),
     valuta_date: moment().utc().format("YYYY-MM-DD"),
     recorded_at: moment().utc().format(),
     recipient_iban: mandate.debtor_iban,
@@ -218,6 +219,7 @@ export const confirmTransaction = async (req, res) => {
   Object.assign(transfer, {
     transaction_id: transfer.id,
     booking_date: today,
+    creation_date: today,
     valuta_date: today,
     recorded_at: recordedAtTimestamp,
     name: `bank-mock-transaction-${Math.random()}`,
@@ -259,6 +261,7 @@ export const creteBookingFromSepaCreditTransfer = ({
   status,
   transaction_id: id,
   booking_date: moment().utc().format("YYYY-MM-DD"),
+  creation_date: moment().utc().format("YYYY-MM-DD"),
   valuta_date: moment().utc().format("YYYY-MM-DD"),
   recorded_at: moment().utc().format(),
   meta_info: null,
@@ -309,6 +312,7 @@ export const creteBookingFromReservation = (person, reservation, incoming?) => {
     sender_name: senderName || SOLARIS_CARDS_ACCOUNT.NAME,
     sender_iban: senderIBAN || SOLARIS_CARDS_ACCOUNT.IBAN,
     booking_date: moment().utc().format("YYYY-MM-DD"),
+    creation_date: moment().utc().format("YYYY-MM-DD"),
     valuta_date: moment().utc().format("YYYY-MM-DD"),
     recorded_at: moment().utc().format(),
     meta_info: metaInfo,
