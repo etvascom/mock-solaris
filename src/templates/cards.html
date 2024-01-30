@@ -1262,12 +1262,12 @@
                   {{ (JSON.parse(reservation.meta_info)).cards.transaction_type }}
                 </div>
                 <div>
-                  <input type="checkbox" id="increaseAmount" name="increaseAmount" value="false" />
-                  <label for="increaseAmount">Increase amount</label>
+                  <input type="checkbox" id="increaseAmount-{{reservation.id}}" name="increaseAmount" value="false" />
+                  <label for="increaseAmount-{{reservation.id}}">Increase amount</label>
                 </div>
                 <div>
-                  <input type="checkbox" id="decreaseAmount" name="decreaseAmount" value="false" />
-                  <label for="decreaseAmount">Decrease amount</label>
+                  <input type="checkbox" id="decreaseAmount-{{reservation.id}}" name="decreaseAmount" value="false" />
+                  <label for="decreaseAmount-{{reservation.id}}">Decrease amount</label>
                 </div>
               </td>
               <td>
