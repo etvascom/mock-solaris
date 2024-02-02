@@ -589,16 +589,25 @@ export const createReservation = async ({
   return reservation;
 };
 
-const resolveReservation = async (reservation) => {
-  const resolvedReservation = {
-    ...reservation,
-    status: ReservationStatus.RESOLVED,
-    resolved_at: moment().toDate(),
-  };
+const resolveReservation = async (person, reservation) => {
+  person.account.reservations = person.account.reservations.map((res) => {
+    if (res.id === reservation.id) {
+      return {
+        ...res,
+        status: ReservationStatus.RESOLVED,
+        resolved_at: moment().toDate(),
+      };
+    }
+    return res;
+  });
+
+  reservation.status = ReservationStatus.RESOLVED;
+
+  await db.savePerson(person);
 
   await triggerWebhook(
     CardWebhookEvent.CARD_AUTHORIZATION_RESOLUTION,
-    resolvedReservation
+    reservation
   );
 };
 
@@ -645,7 +654,7 @@ const bookReservation = async (
 
   await db.savePerson(person);
 
-  await resolveReservation(reservation);
+  await resolveReservation(person, reservation);
 
   await triggerBookingsWebhook(booking);
 };
@@ -698,7 +707,7 @@ export const updateReservation = async ({
 
   switch (action) {
     case ActionType.RESOLVE: {
-      return resolveReservation(reservation);
+      return resolveReservation(person, reservation);
     }
     case ActionType.BOOK: {
       return bookReservation(
