@@ -315,6 +315,7 @@ export const creteBookingFromReservation = (person, reservation, incoming?) => {
     creation_date: moment().utc().format("YYYY-MM-DD"),
     valuta_date: moment().utc().format("YYYY-MM-DD"),
     recorded_at: moment().utc().format(),
+    transaction_id: uuid.v4(),
     meta_info: metaInfo,
   };
 };
