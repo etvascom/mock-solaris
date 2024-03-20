@@ -763,11 +763,16 @@ export const getAccountReservations = async (
     []
   ) as Reservation[];
 
+  const statusFilter = [
+    ...filter.status,
+    ...(filter.status?.includes("RESOLVED") ? ["EXPIRED"] : []),
+  ];
+
   const filteredReservations = _.filter(
     reservations,
     (reservation) =>
       arrayIncludesOrIgnoreIfUndefined(filter.id, reservation.id) &&
-      arrayIncludesOrIgnoreIfUndefined(filter.status, reservation.status) &&
+      arrayIncludesOrIgnoreIfUndefined(statusFilter, reservation.status) &&
       arrayIncludesOrIgnoreIfUndefined(
         filter.reservation_type,
         reservation.reservation_type
