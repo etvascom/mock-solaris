@@ -1249,7 +1249,7 @@
             <th>action</th>
             <th>Date</th>
             <th>Amount</th>
-            <th>Recipient</th>
+            <th>ID</th>
           </tr>
         </thead>
         {% for reservation in person.account.openReservations %}
@@ -1257,7 +1257,7 @@
           <tr>
             <form id="updateReservation" action="/__BACKOFFICE__/person/{{ person.id }}/reservations/{{ reservation.id }}"
               method="POST">
-              <td>
+              <td style="min-width: 200px">
                 <div>
                   {{ (JSON.parse(reservation.meta_info)).cards.transaction_type }}
                 </div>
@@ -1282,7 +1282,7 @@
               </td>
               <td>{{ (JSON.parse(reservation.meta_info)).cards.transaction_date }}</td>
               <td>{{ (reservation.amount.value / 100).toFixed(2) }} {{ reservation.amount.currency }}</td>
-              <td>{{ reservation.description }}</td>
+              <td>{{ reservation.id }}</td>
             </form>
           </tr>
           {% endif %}
