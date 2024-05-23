@@ -1,3 +1,4 @@
+import moment from "moment";
 import { CountryCode, IBAN } from "ibankit";
 import _ from "lodash";
 import uuid from "node-uuid";
@@ -53,11 +54,16 @@ const requestAccountFields = [
 
 export const showAccountBookings = async (req, res) => {
   const { account_id: accountId } = req.params;
+  const {
+    booking_date: { min: minBookingDate },
+  } = req.query;
 
   const person = await findPersonByAccountId(accountId);
 
   const transactions = _.get(person, "transactions", []).filter(
-    ({ account_id }) => account_id === accountId
+    ({ account_id, creation_date }) =>
+      account_id === accountId &&
+      moment(creation_date).isSameOrAfter(moment(minBookingDate))
   );
 
   const sortAccepted = ["id", "booking_date", "valuta_date", "recorded_at"];
