@@ -1,3 +1,5 @@
+import moment from "moment";
+
 interface FilterConfigRange {
   [key: string]: {
     min?: number | string;
@@ -26,12 +28,22 @@ const isInFilter = (filter, value) => {
     return value[filter.key] === filter.eq;
   }
 
-  if (filter.min !== null && value[filter.key] < filter.min) {
-    return false;
+  if (filter.min !== null) {
+    const minDate = moment(filter.min);
+    if (minDate.isValid()) {
+      return moment(value[filter.key]).isSameOrAfter(minDate);
+    }
+
+    return value[filter.key] >= filter.min;
   }
 
-  if (filter.max !== null && value[filter.key] > filter.max) {
-    return false;
+  if (filter.max !== null) {
+    const maxDate = moment(filter.max);
+    if (maxDate.isValid()) {
+      return moment(value[filter.key]).isSameOrBefore(maxDate);
+    }
+
+    return value[filter.key] <= filter.max;
   }
 
   return true;
