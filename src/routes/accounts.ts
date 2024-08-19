@@ -54,16 +54,15 @@ const requestAccountFields = [
 
 export const showAccountBookings = async (req, res) => {
   const { account_id: accountId } = req.params;
-  const {
-    booking_date: { min: minBookingDate },
-  } = req.query;
+  const minBookingDate = req.query.booking_date?.min;
 
   const person = await findPersonByAccountId(accountId);
 
   const transactions = _.get(person, "transactions", []).filter(
     ({ account_id, creation_date }) =>
       account_id === accountId &&
-      moment(creation_date).isSameOrAfter(moment(minBookingDate))
+      (!minBookingDate ||
+        moment(creation_date).isSameOrAfter(moment(minBookingDate)))
   );
 
   const sortAccepted = ["id", "booking_date", "valuta_date", "recorded_at"];
