@@ -714,6 +714,7 @@ export const createReservationHandler = async (req, res) => {
     senderIBAN,
     merchantId,
     categoryCode,
+    countryCode,
   } = req.body;
 
   if (!personId) {
@@ -736,6 +737,7 @@ export const createReservationHandler = async (req, res) => {
     description,
     senderIBAN,
     categoryCode,
+    countryCode,
     merchantId,
   };
 

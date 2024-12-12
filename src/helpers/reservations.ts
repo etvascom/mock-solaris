@@ -92,6 +92,7 @@ export const generateMetaInfo = ({
   posEntryMode,
   merchantId,
   categoryCode,
+  countryCode,
 }: {
   originalAmount: number;
   originalCurrency: string;
@@ -104,12 +105,13 @@ export const generateMetaInfo = ({
   posEntryMode: POSEntryMode;
   merchantId?: string;
   categoryCode?: string;
+  countryCode?: string;
 }) => {
   return JSON.stringify({
     cards: {
       card_id: cardId,
       merchant: {
-        country_code: "DE",
+        country_code: countryCode,
         category_code: categoryCode,
         name: sender,
         iban: senderIBAN,
@@ -144,6 +146,7 @@ const mapDataToReservation = ({
   description,
   merchantId,
   categoryCode,
+  countryCode,
 }: {
   amount: number;
   originalAmount: number;
@@ -158,6 +161,7 @@ const mapDataToReservation = ({
   description: string;
   merchantId?: string;
   categoryCode?: string;
+  countryCode?: string;
 }): Reservation => {
   const date = moment().toDate();
 
@@ -183,6 +187,7 @@ const mapDataToReservation = ({
       posEntryMode,
       merchantId,
       categoryCode,
+      countryCode,
     }),
     expires_at: null,
     expired_at: null,
@@ -469,6 +474,7 @@ export const createReservation = async ({
   iban = "DE89370400440532013000",
   description = "Transaction made",
   categoryCode = "3058",
+  countryCode = "DE",
   merchantId,
 }: {
   personId: string;
@@ -483,6 +489,7 @@ export const createReservation = async ({
   iban?: string;
   description?: string;
   categoryCode?: string;
+  countryCode?: string;
   merchantId?: string;
 }) => {
   const person = await db.getPerson(personId);
@@ -503,6 +510,7 @@ export const createReservation = async ({
     description,
     merchantId,
     categoryCode,
+    countryCode,
   };
 
   const reservation = mapDataToReservation(cardAuthorizationPayload);
