@@ -32,6 +32,8 @@ await $`aws elasticbeanstalk update-environment --application-name Test_Solaris 
 await $`aws elasticbeanstalk wait environment-updated --application-name Test_Solaris --environment-name Testsolaris-${ENV.toLowerCase()} --version-label ${APP_VERSION_LABEL} --profile=etvas_demo`;
 
 console.log(`Setting up webhooks...`);
-await fetch(`https://ebank-api-${ENV}.etvas-automat.com/reset`);
+await fetch(
+  `https://ebank-api${ENV === "dev" ? "-dev" : ""}.etvas-automat.com/reset`
+);
 
 console.log(`Deployment finished`);
