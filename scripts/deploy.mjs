@@ -27,7 +27,7 @@ console.log(`Creating application version ${APP_VERSION_LABEL}...`);
 await $`aws elasticbeanstalk create-application-version --application-name Test_Solaris --version-label ${APP_VERSION_LABEL} --source-bundle S3Bucket="${S3_BUCKET}",S3Key="${S3_FILE_NAME}" --profile=etvas_demo`;
 
 console.log(`Updating environment...`);
-await $`aws elasticbeanstalk update-environment --application-name Test_Solaris --environment-name Testsolaris-dev --version-label ${APP_VERSION_LABEL} --profile=etvas_demo`;
+await $`aws elasticbeanstalk update-environment --application-name Test_Solaris --environment-name Testsolaris-${ENV.toLowerCase()} --version-label ${APP_VERSION_LABEL} --profile=etvas_demo`;
 
 await $`aws elasticbeanstalk wait environment-updated --application-name Test_Solaris --environment-name Testsolaris-${ENV.toLowerCase()} --version-label ${APP_VERSION_LABEL} --profile=etvas_demo`;
 
