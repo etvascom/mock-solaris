@@ -54,7 +54,7 @@ const requestAccountFields = [
 
 export const showAccountBookings = async (req, res) => {
   const { account_id: accountId } = req.params;
-  const minBookingDate = req.query.booking_date?.min;
+  const minBookingDate = req.query.filter?.recorded_at?.min;
 
   const person = await findPersonByAccountId(accountId);
 
