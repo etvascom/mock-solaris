@@ -301,7 +301,7 @@ export const creteBookingFromReservation = (person, reservation, incoming?) => {
     booking_type: BookingType.CARD_TRANSACTION,
     amount: {
       unit: "cents",
-      currency: "EUR",
+      currency: reservation.amount.currency ?? "EUR",
       value: amount,
     },
     description: reservation.description || senderName,

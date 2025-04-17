@@ -171,7 +171,7 @@ const mapDataToReservation = ({
     amount: {
       value: amount,
       unit: "cents",
-      currency: "EUR",
+      currency: originalCurrency ?? "EUR",
     },
     reservation_type: ReservationType.CARD_AUTHORIZATION,
     reference: uuid.v4(),
