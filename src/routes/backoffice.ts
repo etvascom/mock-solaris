@@ -118,9 +118,9 @@ export const listPersonsCards = async (req, res) => {
     ...person,
     account: {
       ...person.account,
-      openReservations: person.account.reservations.filter(
-        (r) => r.status === "OPEN"
-      ),
+      openReservations: person.accounts
+        .flatMap(({ reservations }) => reservations)
+        .filter((r) => r.status === "OPEN"),
     },
   };
 
@@ -379,7 +379,7 @@ export const processQueuedBooking = async (
         amount: {
           value: booking.amount.value,
           unit: "cents",
-          currency: "EUR",
+          currency: booking.amount.currency,
         },
       };
     }
@@ -398,9 +398,13 @@ export const processQueuedBooking = async (
     booking.recipient_name = senderName;
   }
 
-  booking.account_id = person.accounts[0].id;
+  const accountIndex = person.accounts.findIndex(
+    ({ balance }) =>
+      balance.currency?.toLowerCase() === booking.amount.currency?.toLowerCase()
+  );
+
+  booking.account_id = person.accounts[accountIndex].id;
   booking.amount.unit = "cents";
-  booking.amount.currency = "EUR";
 
   person.transactions.push(booking);
   if (directDebitReturn) {
@@ -445,6 +449,7 @@ export const generateBookingForPerson = (bookingData) => {
     valutaDate,
     recordedAt,
     status,
+    currency,
   } = bookingData;
 
   const recipientName = `${person.salutation} ${person.first_name} ${person.last_name}`;
@@ -458,7 +463,7 @@ export const generateBookingForPerson = (bookingData) => {
 
   return {
     id: uuid.v4(),
-    amount: { value: parseInt(amount, 10) },
+    amount: { value: parseInt(amount, 10), currency },
     valuta_date: valutaDate ? moment(valutaDate).format("YYYY-MM-DD") : today,
     recorded_at: recordedAt ? moment(recordedAt).format() : recordedAtTimestamp,
     description: purpose || "-",
@@ -502,6 +507,7 @@ export const queueBookingRequestHandler = async (req, res) => {
     bookingDate,
     valutaDate,
     status,
+    currency,
   } = req.body;
 
   senderName = senderName || "mocksolaris";
@@ -513,6 +519,7 @@ export const queueBookingRequestHandler = async (req, res) => {
     person,
     purpose,
     amount,
+    currency,
     senderName,
     endToEndId,
     hasFutureValutaDate,
@@ -568,7 +575,7 @@ export const createDirectDebitReturn = async (personId, id, amount) => {
     amount: {
       value: -(amount || directDebit.amount.value),
       unit: "cents",
-      currency: "EUR",
+      currency: directDebit.amount.currency,
     },
     booking_date: today,
     creation_date: today,
@@ -612,7 +619,7 @@ export const createRefundHandler = async (req, res) => {
     amount: {
       value: -(amount || transaction.amount.value),
       unit: "cents",
-      currency: "EUR",
+      currency: transaction.amount.currency,
     },
     booking_type: BookingType.CARD_TRANSACTION,
     booking_date: today,

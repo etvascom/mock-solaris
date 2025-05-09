@@ -2,7 +2,10 @@ import { Booking } from "../helpers/types";
 import moment from "moment";
 import * as falso from "@ngneat/falso";
 
-export const seedTransaction = (accountId: string): Booking => {
+export const seedTransaction = (
+  accountId: string,
+  currency: string = "EUR"
+): Booking => {
   const createdAt = moment().subtract(
     falso.randNumber({ min: 1, max: 7 }),
     "days"
@@ -19,7 +22,7 @@ export const seedTransaction = (accountId: string): Booking => {
     amount: {
       value: -falso.randNumber({ min: 100, max: 10_000 }),
       unit: "cents",
-      currency: "EUR",
+      currency,
     },
     description: falso.randSentence(),
     recipient_bic: "COBADEFFXXX",
@@ -39,5 +42,7 @@ export const seedTransaction = (accountId: string): Booking => {
 
 export const seedTransactions = (
   length: number,
-  accountId: string
-): Booking[] => Array.from({ length }).map(() => seedTransaction(accountId));
+  accountId: string,
+  currency: string = "EUR"
+): Booking[] =>
+  Array.from({ length }).map(() => seedTransaction(accountId, currency));

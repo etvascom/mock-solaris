@@ -56,11 +56,17 @@ export const resetPersonData = async (personId: string) => {
     return;
   }
 
-  person.account = seedAccount(personId);
-  person.accounts = [person.account];
+  person.accounts = [
+    seedAccount(personId, "EUR"),
+    seedAccount(personId, "CHF"),
+    seedAccount(personId, "USD"),
+  ];
+  person.account = person.accounts[0];
 
   person.transactions = _.flatten(
-    person.accounts.map(({ id }) => seedTransactions(1, id))
+    person.accounts.map(({ id, balance }) =>
+      seedTransactions(1, id, balance.currency)
+    )
   );
 
   await savePerson(person);
@@ -278,6 +284,15 @@ const augmentPerson = (person) => {
     augmented.account.pendingReservation =
       augmented.account.pendingReservation || {};
   }
+
+  if (augmented.accounts) {
+    for (const account of augmented.accounts) {
+      account.reservations = account.reservations || [];
+      account.fraudReservations = account.fraudReservations || [];
+      account.pendingReservation = account.pendingReservation || {};
+    }
+  }
+
   return augmented;
 };
 
