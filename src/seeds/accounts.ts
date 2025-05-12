@@ -14,7 +14,7 @@ const correctRandomIBAN = () => {
   return ibans[Math.floor(Math.random() * 4)];
 };
 
-export const seedAccount = (personId: string) => {
+export const seedAccount = (personId: string, currency = "EUR") => {
   const accountId = falso.randUuid();
   return {
     id: accountId,
@@ -31,12 +31,12 @@ export const seedAccount = (personId: string) => {
     available_balance: {
       value: falso.randNumber(),
       unit: "cents",
-      currency: "EUR",
+      currency,
     },
     balance: {
       value: falso.randNumber({ min: 1_000_000 }),
       unit: "cents",
-      currency: "EUR",
+      currency,
     },
     overdraftInterest: falso.randNumber(),
     cards: [

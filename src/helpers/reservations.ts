@@ -497,7 +497,7 @@ export const createReservation = async ({
   const cardAccountId = cardData.card.account_id;
   const convertedAmount = Math.abs(parseInt(amount, 10));
   const cardAuthorizationPayload = {
-    amount: Math.round(convertedAmount * FxRate[currency]),
+    amount: Math.round(convertedAmount),
     originalAmount: convertedAmount,
     originalCurrency: currency,
     type,
@@ -581,7 +581,15 @@ export const createReservation = async ({
     return proceedWithSCAChallenge(person, reservation);
   }
 
-  person.account.reservations.push(reservation);
+  const accountIndex = person.accounts.findIndex(
+    ({ balance }) => balance.currency?.toLowerCase() === currency?.toLowerCase()
+  );
+
+  if (accountIndex === -1) {
+    throw new Error(`Account in ${currency} not found`);
+  }
+
+  person.accounts[accountIndex].reservations.push(reservation);
 
   const currentCardUsages = computeCardUsage(person);
   await validateCardLimits(
@@ -598,7 +606,17 @@ export const createReservation = async ({
 };
 
 const resolveReservation = async (person, reservation) => {
-  person.account.reservations = person.account.reservations.map((res) => {
+  const accountIndex = person.accounts.findIndex(
+    ({ balance }) => balance.currency === reservation.amount.currency
+  );
+
+  if (accountIndex === -1) {
+    throw new Error(`Account in ${reservation.amount.currency} not found`);
+  }
+
+  person.accounts[accountIndex].reservations = person.accounts[
+    accountIndex
+  ].reservations.map((res) => {
     if (res.id === reservation.id) {
       return {
         ...res,
@@ -625,6 +643,14 @@ const bookReservation = async (
   increaseAmount,
   decreaseAmount
 ) => {
+  const accountIndex = person.accounts.findIndex(
+    ({ balance }) => balance.currency === reservation.amount.currency
+  );
+
+  if (accountIndex === -1) {
+    throw new Error(`Account in ${reservation.amount.currency} not found`);
+  }
+
   let additionalAmount = 0;
 
   const amountModPercentage = 50 / 100;
@@ -650,7 +676,9 @@ const bookReservation = async (
 
   person.transactions.push(booking);
 
-  person.account.reservations = person.account.reservations.map((item) =>
+  person.accounts[accountIndex].reservations = person.accounts[
+    accountIndex
+  ].reservations.map((item) =>
     item.id !== reservation.id
       ? item
       : {
@@ -668,7 +696,17 @@ const bookReservation = async (
 };
 
 const expireReservation = async (person, reservation) => {
-  person.account.reservations = person.account.reservations.map((res) => {
+  const accountIndex = person.accounts.findIndex(
+    ({ balance }) => balance.currency === reservation.amount.currency
+  );
+
+  if (accountIndex === -1) {
+    throw new Error(`Account in ${reservation.amount.currency} not found`);
+  }
+
+  person.accounts[accountIndex].reservations = person.accounts[
+    accountIndex
+  ].reservations.map((res) => {
     if (res.id === reservation.id) {
       return {
         ...res,
@@ -705,9 +743,9 @@ export const updateReservation = async ({
 }) => {
   const person = await db.getPerson(personId);
 
-  const reservation = person.account.reservations.find(
-    (r) => r.id === reservationId
-  );
+  const reservation = person.accounts
+    .flatMap(({ reservations }) => reservations)
+    .find((r) => r.id === reservationId);
 
   if (!reservation) {
     throw new Error("Reservation not found");

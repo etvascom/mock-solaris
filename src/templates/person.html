@@ -130,6 +130,14 @@
             <input class="form-control" type="text" name="transactionId" placeholder="Transaction id" value="" />
           </div>
           <div class="form-group">
+            <label class="col-form-label" for="amount">Currency</label>
+            <select class="form-control" name="currency">
+              <option value="EUR">EUR</option>
+              <option value="CHF">CHF</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
+          <div class="form-group">
             <select class="form-control" name="bookingType">
               <option value="CANCELLATION_BOOKING">CANCELLATION_BOOKING</option>
               <option value="CANCELLATION_CARD_TRANSACTION">CANCELLATION_CARD_TRANSACTION</option>
@@ -380,7 +388,16 @@
             <br><span class="label label-default">{{ queuedBooking.status }}</span>
           {% endif %}
         </td>
-        <td>{{ (queuedBooking.amount.value / 100).toFixed(2) }}€</td>
+        <td>{{ (queuedBooking.amount.value / 100).toFixed(2) }}
+          
+          {% if queuedBooking.amount.currency === 'EUR' %}
+            €
+          {% elseif queuedBooking.amount.currency === 'USD' %}
+            $
+          {% else %}
+            {{ queuedBooking.amount.currency }}
+          {% endif %}
+        </td>
         <td>
           {{ queuedBooking.booking_date }}<br>
           {{ queuedBooking.valuta_date }}
@@ -445,7 +462,17 @@
             {{ transaction.booking_type }}
           </span>
         </td>
-        <td>{{ (transaction.amount.value / 100).toFixed(2) }}€</td>
+        <td>{{ (transaction.amount.value / 100).toFixed(2) }} 
+
+          {% if transaction.amount.currency === 'EUR' %}
+            €
+          {% elseif transaction.amount.currency === 'USD' %}
+            $
+          {% else %}
+            {{ transaction.amount.currency }}
+          {% endif %}
+
+        </td>
         <td>
           {{ transaction.booking_date }}<br>
           {{ transaction.valuta_date }}

@@ -8,7 +8,11 @@ const PERSON_COUNT = _.clamp(
 );
 
 const createNewPerson = (personId: string) => {
-  const accounts = [{ ...seedAccount(personId) }];
+  const accounts = [
+    seedAccount(personId, "EUR"),
+    seedAccount(personId, "CHF"),
+    seedAccount(personId, "USD"),
+  ];
 
   return {
     salutation: "MR",
@@ -54,7 +58,11 @@ const createNewPerson = (personId: string) => {
       },
     },
     screening_progress: null,
-    transactions: _.flatten(accounts.map(({ id }) => seedTransactions(1, id))),
+    transactions: _.flatten(
+      accounts.map(({ id, balance }) =>
+        seedTransactions(1, id, balance.currency)
+      )
+    ),
     account: accounts[0],
     accounts,
     billing_account: {
