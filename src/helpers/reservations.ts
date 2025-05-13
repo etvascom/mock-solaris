@@ -494,7 +494,15 @@ export const createReservation = async ({
 }) => {
   const person = await db.getPerson(personId);
   const cardData = person.account.cards.find(({ card }) => card.id === cardId);
-  const cardAccountId = cardData.card.account_id;
+
+  const account = person.accounts.find(
+    ({ balance }) => balance.currency?.toLowerCase() === currency?.toLowerCase()
+  );
+
+  if (!account) {
+    throw new Error(`Account in ${currency} not found`);
+  }
+
   const convertedAmount = Math.abs(parseInt(amount, 10));
   const cardAuthorizationPayload = {
     amount: Math.round(convertedAmount),
@@ -505,7 +513,7 @@ export const createReservation = async ({
     senderIBAN,
     cardId,
     posEntryMode,
-    accountId: cardAccountId,
+    accountId: account.id,
     iban,
     description,
     merchantId,
