@@ -811,11 +811,10 @@ export const getAccountReservations = async (
 ) => {
   const person = await db.findPersonByAccountId(accountId);
 
-  const reservations = _.get(
-    person.account,
-    "reservations",
-    []
-  ) as Reservation[];
+  const openReservations =
+    person.accounts
+      .flatMap(({ reservations }) => reservations)
+      .filter((r) => r.status === "OPEN") ?? [];
 
   const statusFilter = [
     ...filter.status,
@@ -823,7 +822,7 @@ export const getAccountReservations = async (
   ];
 
   const filteredReservations = _.filter(
-    reservations,
+    openReservations,
     (reservation) =>
       arrayIncludesOrIgnoreIfUndefined(filter.id, reservation.id) &&
       arrayIncludesOrIgnoreIfUndefined(statusFilter, reservation.status) &&
