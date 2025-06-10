@@ -515,7 +515,7 @@ export const createReservation = async ({
     posEntryMode,
     accountId: account.id,
     iban,
-    description,
+    description: description?.trim() || "Transaction made",
     merchantId,
     categoryCode,
     countryCode,
