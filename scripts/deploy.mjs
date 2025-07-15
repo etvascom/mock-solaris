@@ -33,7 +33,15 @@ await $`aws elasticbeanstalk wait environment-updated --application-name Test_So
 
 console.log(`Setting up webhooks...`);
 await fetch(
-  `https://ebank-api${ENV === "dev" ? "-dev" : ""}.etvas-automat.com/reset`
+  `https://ebank-api${
+    ENV === "dev" ? "-dev" : ""
+  }.etvas-automat.com/reset/ebank`
+);
+
+await fetch(
+  `https://ebank-api${
+    ENV === "dev" ? "-dev" : ""
+  }.etvas-automat.com/reset/nordea`
 );
 
 console.log(`Deployment finished`);
