@@ -811,11 +811,9 @@ export const getAccountReservations = async (
 ) => {
   const person = await db.findPersonByAccountId(accountId);
 
-  const openReservations =
-    person.accounts
-      .flatMap(({ reservations }) => reservations)
-      .filter((reservation) => reservation.account_id === accountId)
-      .filter((r) => r.status === "OPEN") ?? [];
+  const openReservations = person.accounts
+    .flatMap(({ reservations }) => reservations)
+    .filter((reservation) => reservation.account_id === accountId);
 
   const statusFilter = [
     ...filter.status,
