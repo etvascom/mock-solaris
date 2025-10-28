@@ -29,7 +29,7 @@ export const generateToken = async (req, res) => {
     return;
   }
 
-  const expiresIn = Math.floor(Math.random() * 1000) + 100;
+  const expiresIn = 60 * 60 * 1000; // 1 hour
   const token = Date.now() + ":" + expiresIn;
 
   res.status(201).send({
