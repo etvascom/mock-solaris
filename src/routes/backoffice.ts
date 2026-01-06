@@ -725,6 +725,7 @@ export const createReservationHandler = async (req, res) => {
     merchantId,
     categoryCode,
     countryCode,
+    recordedAt,
   } = req.body;
 
   if (!personId) {
@@ -749,6 +750,7 @@ export const createReservationHandler = async (req, res) => {
     categoryCode,
     countryCode,
     merchantId,
+    recordedAt,
   };
 
   const reservation = await (type === TransactionType.CREDIT_PRESENTMENT
