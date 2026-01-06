@@ -147,6 +147,7 @@ const mapDataToReservation = ({
   merchantId,
   categoryCode,
   countryCode,
+  recordedAt,
 }: {
   amount: number;
   originalAmount: number;
@@ -162,8 +163,13 @@ const mapDataToReservation = ({
   merchantId?: string;
   categoryCode?: string;
   countryCode?: string;
+  recordedAt?: string;
 }): Reservation => {
-  const date = moment().toDate();
+  const date = recordedAt
+    ? moment(recordedAt)
+        .add(Math.floor(Math.random() * 10) + 1, "hours") // INFO: add random hours to avoid same timestamp
+        .toDate()
+    : moment().toDate();
 
   return {
     id: uuid.v4(),
@@ -192,7 +198,7 @@ const mapDataToReservation = ({
     expires_at: null,
     expired_at: null,
     resolved_at: null,
-    created_at: moment().toISOString(),
+    created_at: moment(date).toISOString(),
     description,
     iban,
   };
@@ -476,6 +482,7 @@ export const createReservation = async ({
   categoryCode = "3058",
   countryCode = "DE",
   merchantId,
+  recordedAt,
 }: {
   personId: string;
   cardId: string;
@@ -491,6 +498,7 @@ export const createReservation = async ({
   categoryCode?: string;
   countryCode?: string;
   merchantId?: string;
+  recordedAt?: string;
 }) => {
   const person = await db.getPerson(personId);
   const cardData = person.account.cards.find(({ card }) => card.id === cardId);
@@ -519,6 +527,7 @@ export const createReservation = async ({
     merchantId,
     categoryCode,
     countryCode,
+    recordedAt,
   };
 
   const reservation = mapDataToReservation(cardAuthorizationPayload);
